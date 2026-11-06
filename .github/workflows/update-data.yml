@@ -1,0 +1,41 @@
+name: 상가 자료 자동 업데이트
+
+on:
+  schedule:
+    - cron: "0 1 5 2,5,8,11 *"   # 2·5·8·11월 5일 오전 10시(한국시간)
+  workflow_dispatch:             # Actions 탭에서 'Run workflow'로 바로 실행할 수도 있습니다
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 자료 만들기 (상가정보는 API로 받기)
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          pip install numpy
+          python build_data.py --api
+
+      - name: 브라우저가 새 자료를 받도록 버전 표시 바꾸기
+        run: sed -i -E "s/mapo-data\.js\?v=[^\"]*/mapo-data.js?v=$(date +%Y%m%d)/" index.html
+
+      - name: 바뀐 것이 있으면 저장
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mapo-data.js index.html
+          if git diff --cached --quiet; then
+            echo "바뀐 자료가 없습니다."
+          else
+            git commit -m "자료 자동 업데이트 $(date +%Y-%m-%d)"
+            git push
+          fi
