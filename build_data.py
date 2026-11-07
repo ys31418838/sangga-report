@@ -3,6 +3,7 @@
 사용법
   python build_data.py            # 원본데이터 폴더의 최신 파일로 mapo-data.js를 다시 만듭니다
   python build_data.py --check    # 파일은 쓰지 않고, 기존 mapo-data.js와 무엇이 달라지는지만 보여 줍니다
+  python build_data.py --seoul    # 서울시 상권분석서비스(상권별 점포·개폐업·매출)를 API로 새로 받습니다 (seoul_key.txt)
   python build_data.py --api      # 상가정보를 공공데이터포털 API로 직접 받아 원본데이터 폴더에 저장한 뒤 진행합니다
                                   #   API 키는 이 폴더의 api_key.txt 파일(한 줄) 또는 환경변수 DATA_GO_KR_KEY에 넣습니다
 
@@ -20,6 +21,7 @@ import csv
 import io
 import json
 import math
+import os
 import re
 import shutil
 import sys
@@ -106,7 +108,6 @@ API_FIELDS = {  # API 필드 → 파일 데이터와 같은 컬럼 이름
 
 
 def api_key():
-    import os
     key = os.environ.get("DATA_GO_KR_KEY", "").strip()
     f = HERE / "api_key.txt"
     if not key and f.exists():
@@ -391,10 +392,24 @@ def main():
         data["reb"], meta["reb"] = build_reb(reb_file)
     elif "reb" in old:
         data["reb"] = old["reb"]
+    import seoul_trdar
+    cache = seoul_trdar.CACHE
+    if "--seoul" in sys.argv or not cache.exists():
+        raw = seoul_trdar.fetch() if ("--seoul" in sys.argv or os.environ.get("SEOUL_KEY") or (HERE / "seoul_key.txt").exists()) else None
+    else:
+        raw = json.loads(cache.read_text(encoding="utf-8"))
+        print(f"서울시 상권: {cache.name} ({raw['fetched']} 받은 자료)")
+    if raw:
+        data["trdar"], data["tq"], data["tstat"], m2 = seoul_trdar.build(raw, compress)
+        meta.update(m2)
+    else:
+        for k in ["trdar", "tq", "tstat"]:
+            if k in old:
+                data[k] = old[k]
     data["meta"] = meta
 
     order = ["cats", "addr", "areas", "th", "dongs", "seoul", "pop", "catTop", "catLife", "shops",
-             "zoneOK", "base", "tf", "unitsPerM", "reb", "meta"]
+             "zoneOK", "base", "tf", "unitsPerM", "reb", "trdar", "tq", "tstat", "meta"]
     data = {k: data[k] for k in order if k in data}
 
     print("\n변경 요약 (기존 → 새 자료)")
@@ -408,6 +423,8 @@ def main():
     print(f"  유동인구 {old['pop']['q']} → {data['pop']['q']}  (행정동 {data['pop']['n']}개)")
     if "reb" in data:
         print(f"  임대동향 {meta.get('reb')}: " + ", ".join(f"{k} {v[0]}" for k, v in data["reb"].items()))
+    if "tq" in data:
+        print(f"  서울시 상권 {len(data['trdar'])}개, {meta.get('trdar')}")
     changed = [k for k in data if k in old and old[k] != data[k]]
     print(f"  달라진 항목: {', '.join(changed) or '없음'}")
 

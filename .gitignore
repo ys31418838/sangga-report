@@ -2,3 +2,4 @@ api_key.txt
 _backup/
 원본데이터/상가정보_*.csv
 __pycache__/
+seoul_key.txt

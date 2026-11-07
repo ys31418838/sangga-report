@@ -21,9 +21,11 @@ jobs:
       - name: 자료 만들기 (상가정보는 API로 받기)
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          SEOUL_KEY: ${{ secrets.SEOUL_KEY }}
         run: |
           pip install numpy
-          python build_data.py --api
+          if [ -n "$SEOUL_KEY" ]; then SEOUL=--seoul; else SEOUL=; fi   # 서울시 키가 있으면 상권 매출·개폐업도 새로 받기
+          python build_data.py --api $SEOUL
 
       - name: 자료가 바뀌었으면 저장 (브라우저가 새 자료를 받도록 버전 표시도 바꿈)
         run: |
@@ -34,6 +36,6 @@ jobs:
           sed -i -E "s/mapo-data\.js\?v=[^\"]*/mapo-data.js?v=$(date +%Y%m%d)/" index.html
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add mapo-data.js index.html
+          git add mapo-data.js index.html 원본데이터/서울상권_마포구.json
           git commit -m "자료 자동 업데이트 $(date +%Y-%m-%d)"
           git push
