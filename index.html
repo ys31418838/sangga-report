@@ -177,7 +177,7 @@ button { min-height: 44px; padding: 8px 16px; font: inherit; font-weight: 500; c
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="mapo-data.js?v=20261110" charset="utf-8"></script>
+<script src="mapo-data.js?v=20261110b" charset="utf-8"></script>
 <script>
 const BIZ = {
   cafe:    { label: "카페",   type: "cluster", fit: { young: 20, tour: 20, office: 14, local: 8 } },
@@ -719,15 +719,40 @@ function priceBlock(range) {
   </div>`;
 }
 // ── 서울시 상권분석서비스: 상권 5년 흐름 ──
-function trdarFor(a) {
-  if (!DATA.trdar || !a) return null;
-  let best = null;
-  for (const t of DATA.trdar) {
-    const d = meters(a[2], a[3], t[3], t[4]);
-    const r = d / Math.max(t[5], 80);
-    if (!best || r < best.r) best = { t, d, r };
+const TRDAR_NEAR = 100;  // 경계 밖이어도 이 거리(m) 안이면 가장 가까운 상권의 흐름을 보여 줍니다
+const TRDAR_SHAPE = (DATA.trdar || []).map(t => (t[6] || []).map(flat => {
+  const ring = [[flat[0], flat[1]]];
+  for (let i = 2; i < flat.length; i += 2) {
+    const [y, x] = ring[ring.length - 1];
+    ring.push([y + flat[i], x + flat[i + 1]]);
+  }
+  return ring;
+}));
+function ringDistance(lat, lng, ring) {
+  let best = Infinity;
+  for (let i = 1; i < ring.length; i++) {
+    const ax = (ring[i - 1][1] - lng) * METERS.lng, ay = (ring[i - 1][0] - lat) * METERS.lat;
+    const bx = (ring[i][1] - lng) * METERS.lng, by = (ring[i][0] - lat) * METERS.lat;
+    const dx = bx - ax, dy = by - ay, len = dx * dx + dy * dy;
+    const u = len ? Math.min(1, Math.max(0, -(ax * dx + ay * dy) / len)) : 0;
+    best = Math.min(best, Math.hypot(ax + u * dx, ay + u * dy));
   }
   return best;
+}
+function trdarFor(a) {
+  if (!DATA.trdar || !a) return null;
+  let inside = null, near = null;
+  DATA.trdar.forEach((t, i) => {
+    const rings = TRDAR_SHAPE[i];
+    if (!rings.length) return;
+    if (rings.filter(r => insideRing(a[2], a[3], r)).length % 2) {
+      if (!inside || inside.t[2] === "전통시장") inside = { t, i, d: 0, inside: true };   // 겹치면 전통시장보다 골목·발달상권을 우선합니다
+      return;
+    }
+    const d = Math.min(...rings.map(r => ringDistance(a[2], a[3], r)));
+    if (!near || d < near.d) near = { t, i, d, inside: false };
+  });
+  return inside || near;
 }
 function lastQuarters(n) { return DATA.tq.map((q, i) => i).slice(-n); }
 function recentStat(st) {
@@ -763,14 +788,14 @@ function trendInfo(biz) {
   if (!hit || !DATA.tstat) return null;
   const [code, name, kind] = hit.t;
   const st = DATA.tstat[code]?.[biz];
-  if (hit.r > 1.3 && hit.d > 300) return { name, kind, far: true, d: hit.d };
-  return { name, kind, inside: hit.r <= 1.3, d: hit.d, st, recent: st ? recentStat(st) : null, years: st ? yearStat(st) : [], mapo: mapoStat(biz) };
+  if (!hit.inside && hit.d > TRDAR_NEAR) return { name, kind, far: true, d: hit.d };
+  return { name, kind, inside: hit.inside, d: hit.d, st, recent: st ? recentStat(st) : null, years: st ? yearStat(st) : [], mapo: mapoStat(biz) };
 }
 function trendBlock(biz, info) {
   if (state.biz === "custom") return "";
   if (!info) return "";
-  if (info.far) return `<div class="block"><h3>상권 5년 흐름</h3><p class="summary">서울시 상권분석서비스의 상권 밖에 있는 주소입니다. 가장 가까운 상권은 ${esc(info.name)}(약 ${Math.round(info.d / 10) * 10}m)입니다.</p></div>`;
-  const where = info.inside ? `${esc(info.name)} <small>(${esc(info.kind)})</small>` : `${esc(info.name)} <small>(가장 가까운 상권, ${Math.round(info.d)}m)</small>`;
+  if (info.far) return `<div class="block"><h3>상권 5년 흐름</h3><p class="summary">서울시 상권분석서비스의 공식 상권 경계 밖에 있는 주소입니다. 가장 가까운 상권은 ${esc(info.name)}이고, 경계까지 약 ${Math.round(info.d / 10) * 10}m입니다.</p></div>`;
+  const where = info.inside ? `${esc(info.name)} <small>(${esc(info.kind)})</small>` : `${esc(info.name)} <small>(경계 밖 ${Math.round(info.d)}m)</small>`;
   if (!info.st || !info.years.length) return `<div class="block"><h3>상권 5년 흐름</h3><p class="summary">${where}에는 ${biz.label} 자료가 없습니다.</p></div>`;
   const r = info.recent, m = info.mapo, ys = info.years;
   const max = Math.max(...ys.map(y => y.n), 1);
@@ -781,7 +806,7 @@ function trendBlock(biz, info) {
   const salesFact = r.per ? `<div class="fact"><span>점포당 월평균 추정매출 (최근 1년)</span><b>${won(r.per)}</b><span>마포구 평균 ${m.per ? won(m.per) : "-"}</span></div>` : "";
   return `<div class="block"><h3>상권 5년 흐름</h3>
     <div class="facts">
-      <div class="fact"><span>이 자리가 속한 상권</span><b>${where}</b></div>
+      <div class="fact"><span>${info.inside ? "이 자리가 속한 상권" : "가장 가까운 상권"}</span><b>${where}</b></div>
       <div class="fact"><span>상권 안 ${biz.label}</span><b>${r.now}곳</b></div>
       ${salesFact}
       <div class="fact"><span>연 폐업률 (최근 1년)</span><b>${pct(r.closeRate)}</b><span>마포구 평균 ${pct(m.closeRate)}, 연 개업률 ${pct(r.openRate)}</span></div>
@@ -789,7 +814,7 @@ function trendBlock(biz, info) {
     <p class="summary" style="margin-top:10px">${first.y}년부터 ${last.y}년까지 ${topic(biz.label)} ${move}, 해마다 평균 ${avgOpen.toFixed(1)}곳이 문을 열고 ${avgClose.toFixed(1)}곳이 문을 닫았습니다.</p>
     <ul class="trend" aria-label="연도별 점포 수와 개업, 폐업">${ys.map(y => `<li><span>${y.y}</span><i><b style="width:${y.n / max * 100}%"></b></i><span>${y.n}곳 <small>개업 ${y.open} · 폐업 ${y.close}</small></span></li>`).join("")}</ul>
     ${r.now < 10 ? `<p class="caution">점포가 ${r.now}곳뿐이라 개업률, 폐업률, 매출 평균이 한두 곳의 변화에도 크게 달라집니다. 참고로만 보세요.</p>` : ""}
-    <p class="sub" style="margin-top:8px">서울시 상권분석서비스 ${esc(SRC.trdar)}. 막대는 그해 4분기 점포 수입니다. 상권은 상권 중심점과의 거리로 찾았습니다. 매출은 카드 결제 등을 바탕으로 한 추정치라 실제 매출과 다를 수 있습니다.</p>
+    <p class="sub" style="margin-top:8px">서울시 상권분석서비스 ${esc(SRC.trdar)}. 막대는 그해 4분기 점포 수입니다. 상권은 서울시 공식 상권 경계${SRC.bounds ? `(${esc(SRC.bounds)} 파일)` : ""}로 찾았습니다. 매출은 카드 결제 등을 바탕으로 한 추정치라 실제 매출과 다를 수 있습니다.</p>
   </div>`;
 }
 function compareBars(labels, mine, seoul) {
@@ -905,6 +930,20 @@ function renderMapImage(a) {
     ctx.strokeStyle = ZONE_COLORS[zone];
     ctx.stroke(new Path2D(d));
   });
+  const hit = trdarFor(a);
+  const inView = t => { const [mx, my] = toMap(t[3], t[4]); return Math.abs(mx - cx) < reach && Math.abs(my - cy) < reach; };
+  (DATA.trdar || []).forEach((t, i) => {
+    if (!TRDAR_SHAPE[i].length || !inView(t) || (a[5] && !(hit && hit.i === i))) return;   // 연남동 권역 주소는 권역선이 있어 소속 상권만 그립니다
+    const path = new Path2D();
+    TRDAR_SHAPE[i].forEach(ring => ring.forEach(([y, x], j) => {
+      const [mx, my] = toMap(y, x);
+      if (j) path.lineTo(mx, my); else path.moveTo(mx, my);
+    }));
+    const mine = hit && hit.i === i;
+    if (mine && hit.inside) { ctx.fillStyle = "rgba(15,124,138,.17)"; ctx.fill(path, "evenodd"); }
+    ctx.strokeStyle = "#0f7c8a"; ctx.lineWidth = mine ? 3 : 1.6;
+    ctx.stroke(path);
+  });
   ctx.restore();
   const font = weight => `${weight} 19px "Noto Sans KR", "Malgun Gothic", sans-serif`;
   const label = (text, x, y, color) => {
@@ -919,6 +958,16 @@ function renderMapImage(a) {
     ctx.fillStyle = "#ffffff"; ctx.font = font(700); ctx.textAlign = "center"; ctx.fillText(n, sx, sy + 7);
   });
   DATA.base.pois.forEach(([x, y, text]) => { const [sx, sy] = px(x, y); label(text, sx, sy, "#1f2a24"); });
+  (DATA.trdar || []).forEach((t, i) => {
+    if (!TRDAR_SHAPE[i].length || (a[5] && !(hit && hit.i === i))) return;
+    const [mx, my] = toMap(t[3], t[4]);
+    const [sx, sy] = px(mx, my);
+    if (sx < 40 || sy < 20 || sx > w - 40 || sy > h - 20) return;
+    const nearPin = Math.hypot(sx - w / 2, sy - (h / 2 - 40)) < 90;
+    const mine = hit && hit.i === i && hit.inside;
+    if (nearPin && !mine) return;   // 핀과 겹치는 다른 상권 이름은 빼고, 이 주소의 상권 이름은 핀 아래에 씁니다
+    label(t[1], nearPin ? w / 2 : sx, nearPin ? h / 2 + 28 : sy, "#0b5d68");
+  });
   DATA.stations.forEach(([name, y, x]) => {
     const [mx, my] = toMap(y, x);
     const [sx, sy] = px(mx, my);
@@ -1014,7 +1063,7 @@ function mapBlock() {
   const query = encodeURIComponent(`서울 마포구 ${place[1] || place[0]}`);
   return `<div class="block map-wrap"><h3>위치 지도</h3>
     <canvas id="placeMap" width="${MAP_SIZE.w}" height="${MAP_SIZE.h}" role="img" aria-label="${esc(place[0])} 위치와 주변 상가 밀도 지도"></canvas>
-    <p class="sub">빨간 핀: 입력한 주소. 파란 점: 지하철역. 점선: 반경 300m. 초록이 진할수록 음식·소매·생활서비스 점포가 많은 곳입니다.${inYeonnam() ? " 숫자는 연남동 권역입니다." : ""} 지도는 ${MAP_METERS.toLocaleString()}m 폭의 약도이며, 유동인구가 아니라 상가 밀도입니다. 도로·역 © OpenStreetMap contributors.</p>
+    <p class="sub">빨간 핀: 입력한 주소. 파란 점: 지하철역. 점선: 반경 300m. 청록 선: 서울시 공식 상권 경계${trdarFor(place)?.inside ? `(색칠한 곳이 이 주소의 상권 ${esc(trdarFor(place).t[1])})` : ""}. 초록이 진할수록 음식·소매·생활서비스 점포가 많은 곳입니다.${inYeonnam() ? " 숫자는 연남동 권역입니다." : ""} 지도는 ${MAP_METERS.toLocaleString()}m 폭의 약도이며, 유동인구가 아니라 상가 밀도입니다. 도로·역 © OpenStreetMap contributors.</p>
     <a class="map-link" data-html2canvas-ignore href="https://map.naver.com/p/search/${query}" target="_blank" rel="noopener">네이버 지도에서 크게 보기</a>
   </div>`;
 }
@@ -1122,7 +1171,7 @@ function render() {
     점수방식: r.priceKnown ? "100점 만점" : "가격 비교 불가, 나머지 80점을 100점으로 환산",
     월세: gapText, 주변상가: around ? { 반경: "300m", 같은업종수: around.count, 수준: COMPETE_LABEL[state.compete], 주요상권: area, 많은업종: around.top.map(t => `${t[0]} ${t[1]}곳`) } : "자동 집계 없음",
     유동인구: dong ? { 단위: "행정동 전체", 동: dong.name, 비교기준: "서울 평균 동을 1로 본 배수", 오전: dong.dense.am, 오후: dong.dense.pm, 저녁: dong.dense.eve, 평일: dong.dense.wk, 주말: dong.dense.we, 전년동기대비: `${dong.yoy}%`, 이십삼십대비중: `${dong.young}%` } : "자동 집계 없음",
-    상권5년흐름: trend && trend.recent ? { 주의: trend.recent.now < 10 ? "점포 수가 적어 비율이 크게 흔들릴 수 있음" : "없음", 출처: "서울시 상권분석서비스(추정치)", 상권: trend.name, 상권안같은업종: `${trend.recent.now}곳`, 점포당월평균추정매출: trend.recent.per ? won(trend.recent.per) : "자료 없음", 마포구평균월매출: trend.mapo.per ? won(trend.mapo.per) : "자료 없음", 연폐업률: trend.recent.closeRate?.toFixed(1) + "%", 마포구평균폐업률: trend.mapo.closeRate?.toFixed(1) + "%", 연도별점포수: trend.years.map(y => `${y.y}년 ${y.n}곳(개업 ${y.open}, 폐업 ${y.close})`) } : "자료 없음",
+    상권5년흐름: trend && trend.recent ? { 주의: trend.recent.now < 10 ? "점포 수가 적어 비율이 크게 흔들릴 수 있음" : "없음", 출처: "서울시 상권분석서비스(추정치)", 상권: trend.inside ? trend.name : `${trend.name}(경계 밖 ${Math.round(trend.d)}m, 가장 가까운 상권)`, 상권안같은업종: `${trend.recent.now}곳`, 점포당월평균추정매출: trend.recent.per ? won(trend.recent.per) : "자료 없음", 마포구평균월매출: trend.mapo.per ? won(trend.mapo.per) : "자료 없음", 연폐업률: trend.recent.closeRate?.toFixed(1) + "%", 마포구평균폐업률: trend.mapo.closeRate?.toFixed(1) + "%", 연도별점포수: trend.years.map(y => `${y.y}년 ${y.n}곳(개업 ${y.open}, 폐업 ${y.close})`) } : "자료 없음",
     주고객층: CUSTOMERS[state.customer],
     공공참고임대료: rebRent() ? `${rebRent().name} 상권 평당 ${rebRent().pyeong.toFixed(1)}만원(1층, 전용+공용 면적, 보증금 환산 포함, 전용 평당과 직접 비교 불가)` : "없음",
     "계약 전 확인": Object.fromEntries(RISKS.map(item => [item.label, RISK_OPTS.find(o => o[0] === state[item.key])[1]]))

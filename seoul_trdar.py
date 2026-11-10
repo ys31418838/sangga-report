@@ -3,19 +3,25 @@
 build_data.py가 불러 씁니다. 단독 실행하면 마포구 자료를 새로 받아 원본데이터 폴더에 저장합니다.
   python seoul_trdar.py
 
+공식 상권 경계는 API에 없어서 서울 열린데이터광장 OA-15560의 zip 파일로 따로 만듭니다.
+  python seoul_trdar.py --bounds "서울시 상권분석서비스(영역-상권).zip"
+
 인증키: 이 폴더의 seoul_key.txt 파일(한 줄) 또는 환경변수 SEOUL_KEY
 """
 import json
 import math
 import os
+import struct
 import sys
 import time
 import urllib.request
+import zipfile
 from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 CACHE = HERE / "원본데이터" / "서울상권_마포구.json"
+BOUNDS = HERE / "원본데이터" / "서울상권경계_마포구.json"   # 공식 상권 경계 (아래 --bounds로 만듭니다)
 API = "http://openapi.seoul.go.kr:8088/{key}/json/{svc}/{a}/{b}/{extra}"
 GU = "11440"
 
@@ -140,19 +146,83 @@ def tm5181_to_wgs84(x, y):
     return math.degrees(lat), math.degrees(lon)
 
 
+# ── 공식 상권 경계 (SHP가 든 zip → 마포구만 JSON으로) ────────────
+def read_shapefile(zip_path):
+    """zip 안의 Polygon SHP를 표준 라이브러리만으로 읽습니다. 반환: [(속성 dict, [고리, ...]), ...]"""
+    z = zipfile.ZipFile(zip_path)
+    get = lambda ext: z.read(next(n for n in z.namelist() if n.lower().endswith(ext)))
+    enc = get(".cpg").decode("ascii").strip() or "utf-8"
+    dbf, shp = get(".dbf"), get(".shp")
+    count = struct.unpack("<I", dbf[4:8])[0]
+    head, size = struct.unpack("<HH", dbf[8:12])
+    fields, p = [], 32
+    while dbf[p] != 13:
+        fields.append((dbf[p:p + 11].split(b"\0")[0].decode("ascii"), dbf[p + 16]))
+        p += 32
+    rows = []
+    for i in range(count):
+        rec, row, o = dbf[head + i * size + 1:head + (i + 1) * size], {}, 0
+        for name, width in fields:
+            row[name] = rec[o:o + width].decode(enc, "replace").strip()
+            o += width
+        rows.append(row)
+    shapes, p = [], 100
+    while p < len(shp):
+        words = struct.unpack(">i", shp[p + 4:p + 8])[0]
+        body = shp[p + 8:p + 8 + words * 2]
+        p += 8 + words * 2
+        if struct.unpack("<i", body[:4])[0] == 0:
+            shapes.append([])
+            continue
+        parts_n, pts_n = struct.unpack("<ii", body[36:44])
+        parts = list(struct.unpack(f"<{parts_n}i", body[44:44 + 4 * parts_n]))
+        xy = struct.unpack(f"<{pts_n * 2}d", body[44 + 4 * parts_n:44 + 4 * parts_n + 16 * pts_n])
+        pts = list(zip(xy[0::2], xy[1::2]))
+        shapes.append([pts[a:b] for a, b in zip(parts, parts[1:] + [pts_n])])
+    return list(zip(rows, shapes))
+
+
+def save_bounds(zip_path):
+    info = zipfile.ZipFile(zip_path).infolist()[0].date_time
+    out = {r["TRDAR_CD"]: [[[round(x, 1), round(y, 1)] for x, y in ring] for ring in rings]
+           for r, rings in read_shapefile(zip_path) if r["SIGNGU_CD"] == GU}
+    BOUNDS.write_text(json.dumps({"file": f"{info[0]}-{info[1]:02d}-{info[2]:02d}", "bounds": out},
+                                 ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"저장: {BOUNDS.relative_to(HERE)} (마포구 상권 {len(out)}개)")
+
+
+def ring_flat(ring, compress):
+    """TM 고리 → 압축 좌표 [y0,x0,dy,dx,...] (약 2m 허용오차로 단순화). 닫힌 고리는 반으로 나눠 단순화합니다."""
+    from osm_base import simplify
+    pts = [compress(*tm5181_to_wgs84(x, y)) for x, y in ring]
+    mid = len(pts) // 2
+    pts = simplify(pts[:mid + 1]) + simplify(pts[mid:])[1:]
+    flat = list(pts[0])
+    for (y0, x0), (y1, x1) in zip(pts, pts[1:]):
+        flat += [y1 - y0, x1 - x0]
+    return flat
+
+
 # ── 리포트용 자료로 가공 ─────────────────────────────────────────
 def build(raw, compress):
     """반환: (trdar, tq, tstat, meta)
-    trdar : [[상권코드, 상권명, 상권구분, 위도압축, 경도압축, 반경m], ...]
+    trdar : [[상권코드, 상권명, 상권구분, 위도압축, 경도압축, 반경m, 경계고리들], ...]
+            경계고리 = [[y0,x0,dy,dx,...], ...] (첫 점은 절대값, 다음부터 앞 점과의 차이. 경계 파일이 없으면 빈 목록)
     tq    : 분기 코드 목록 (예: ["20213", ..., "20262"])
     tstat : {상권코드: {업종: {"n":[점포수], "o":[개업수], "c":[폐업수], "s":[분기매출(만원)], "t":[분기매출건수]}}}
     """
-    trdar = []
+    saved = json.loads(BOUNDS.read_text(encoding="utf-8")) if BOUNDS.exists() else {"file": "", "bounds": {}}
+    trdar, no_shape = [], []
     for r in sorted(raw["areas"], key=lambda r: r["TRDAR_CD"]):
         lat, lng = tm5181_to_wgs84(float(r["XCNTS_VALUE"]), float(r["YDNTS_VALUE"]))
         y, x = compress(lat, lng)
         radius = round(math.sqrt(float(r["RELM_AR"]) / math.pi))
-        trdar.append([r["TRDAR_CD"], r["TRDAR_CD_NM"], r["TRDAR_SE_CD_NM"], y, x, radius])
+        rings = [ring_flat(ring, compress) for ring in saved["bounds"].get(r["TRDAR_CD"], [])]
+        if not rings:
+            no_shape.append(r["TRDAR_CD_NM"])
+        trdar.append([r["TRDAR_CD"], r["TRDAR_CD_NM"], r["TRDAR_SE_CD_NM"], y, x, radius, rings])
+    if no_shape:
+        print(f"  ! 공식 경계가 없는 상권 {len(no_shape)}개: {', '.join(no_shape[:10])}")
 
     tq = sorted({r["STDR_YYQU_CD"] for r in raw["stores"]})
     qi = {q: i for i, q in enumerate(tq)}
@@ -180,8 +250,13 @@ def build(raw, compress):
         b["s"][i] += round(float(r["THSMON_SELNG_AMT"] or 0) / 10000)
         b["t"][i] += int(float(r["THSMON_SELNG_CO"] or 0))
     meta = {"trdar": f"{tq[0][:4]}년 {tq[0][4]}분기~{tq[-1][:4]}년 {tq[-1][4]}분기", "trdarFetched": raw["fetched"]}
+    if saved["file"]:
+        meta["bounds"] = f"{saved['file'][:4]}년 {int(saved['file'][5:7])}월"
     return trdar, tq, tstat, meta
 
 
 if __name__ == "__main__":
-    fetch()
+    if len(sys.argv) == 3 and sys.argv[1] == "--bounds":
+        save_bounds(sys.argv[2])
+    else:
+        fetch()
