@@ -4,6 +4,7 @@
   python build_data.py            # 원본데이터 폴더의 최신 파일로 mapo-data.js를 다시 만듭니다
   python build_data.py --check    # 파일은 쓰지 않고, 기존 mapo-data.js와 무엇이 달라지는지만 보여 줍니다
   python build_data.py --seoul    # 서울시 상권분석서비스(상권별 점포·개폐업·매출)를 API로 새로 받습니다 (seoul_key.txt)
+  python build_data.py --osm      # OpenStreetMap 역·도로 자료를 새로 받습니다 (없으면 원본데이터 폴더의 저장본을 씁니다)
   python build_data.py --api      # 상가정보를 공공데이터포털 API로 직접 받아 원본데이터 폴더에 저장한 뒤 진행합니다
                                   #   API 키는 이 폴더의 api_key.txt 파일(한 줄) 또는 환경변수 DATA_GO_KR_KEY에 넣습니다
 
@@ -49,7 +50,7 @@ FOOD_EXCLUDE = {"카페", "구내식당", "뷔페", "무도 유흥 주점", "생
 LIFE_TOPS = {"소매", "음식", "수리·개인"}   # 지도 밀도와 '많은 업종' 집계에 쓰는 대분류
 ZONE_DONGS = {"연남동", "동교동"}         # 연남동 권역을 붙일 법정동 (권역 지도 범위)
 
-REB_AREAS = ["동교/연남", "홍대/합정", "망원역", "공덕역", "신촌/이대"]
+REB_AREAS = ["동교/연남", "홍대/합정", "망원역", "공덕역", "신촌/이대", "영등포신촌"]
 
 TIME_COLS = ["시간대_00_06", "시간대_06_11", "시간대_11_14", "시간대_14_17", "시간대_17_21", "시간대_21_24"]
 AGE_COLS = ["연령대_10", "연령대_20", "연령대_30", "연령대_40", "연령대_50", "연령대_60_이상"]
@@ -378,6 +379,27 @@ def main():
     assign_zones(data["addr"], data["base"], data["tf"])
     data["th"] = thresholds(data["addr"], data["shops"])
 
+    import osm_base
+    if "--osm" in sys.argv:
+        osm_raw = osm_base.fetch()
+    elif osm_base.CACHE.exists():
+        osm_raw = json.loads(osm_base.CACHE.read_text(encoding="utf-8"))
+        print(f"OSM 역·도로: {osm_base.CACHE.name} ({osm_raw['fetched']} 받은 자료)")
+    else:
+        osm_raw = None
+    if osm_raw:
+        data["stations"], data["roads"] = osm_base.build(osm_raw, compress, data["addr"])
+        meta["osm"] = f"{osm_raw['fetched'][:4]}년 {int(osm_raw['fetched'][5:7])}월"
+    else:
+        print("OSM 역·도로: 캐시 없음 → 기존 자료를 그대로 씁니다")
+        before = {a[0]: a[6:8] for a in old["addr"]}
+        for a in data["addr"]:
+            del a[6:]
+            a += before.get(a[0]) or [-1, -1]
+        for k in ["stations", "roads"]:
+            if k in old:
+                data[k] = old[k]
+
     dong_file, seoul_file = find_file("길단위인구-행정동"), find_file("길단위인구-서울시")
     if dong_file and seoul_file:
         print(f"유동인구: {dong_file.name}, {seoul_file.name}")
@@ -409,7 +431,7 @@ def main():
     data["meta"] = meta
 
     order = ["cats", "addr", "areas", "th", "dongs", "seoul", "pop", "catTop", "catLife", "shops",
-             "zoneOK", "base", "tf", "unitsPerM", "reb", "trdar", "tq", "tstat", "meta"]
+             "zoneOK", "base", "tf", "unitsPerM", "reb", "trdar", "tq", "tstat", "stations", "roads", "meta"]
     data = {k: data[k] for k in order if k in data}
 
     print("\n변경 요약 (기존 → 새 자료)")
