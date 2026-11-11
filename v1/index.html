@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>공개용 상가 입지 리포트</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 왼쪽은 현장 입력지, 오른쪽은 그 자리에서 채워지는 입지 확인서 */
+:root {
+  --bg: #eef1ea; --surface: #fbfcf9; --ink: #1f2a24; --muted: #5a675f; --line: #cfd8cd;
+  --sage: #5f7d6b; --sage-deep: #3e5a4b; --sage-soft: #dfe7dd; --on-sage: #ffffff;
+  --track: #dde3da; --warn: #8f5a0c; --warn-soft: #f5ead6; --bad: #9c3a2f; --bad-soft: #f6e2de;
+  --good: #356a4c; --good-soft: #dcebdf;
+  --d1: #e3ebe2; --d2: #c5d6c8; --d3: #9dbba7; --d4: #5f8570; --d5: #3e5a4b; --d-ink: #1f2a24; --d-ink-strong: #ffffff;
+  --display: "Gowun Batang", "Noto Serif KR", serif;
+  --body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161b18; --surface: #1f2622; --ink: #e8eee9; --muted: #a5b2a9; --line: #38443d;
+    --sage: #8fae9b; --sage-deep: #b5cdbd; --sage-soft: #2d3a33; --on-sage: #14201a;
+    --track: #33403a; --warn: #e6b566; --warn-soft: #3b3020; --bad: #ee9a8e; --bad-soft: #43291f;
+    --good: #93cfa9; --good-soft: #233a2c;
+    --d1: #27332c; --d2: #34483d; --d3: #4a6a58; --d4: #6b9079; --d5: #a6c6b1; --d-ink: #e8eee9; --d-ink-strong: #14201a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161b18; --surface: #1f2622; --ink: #e8eee9; --muted: #a5b2a9; --line: #38443d;
+  --sage: #8fae9b; --sage-deep: #b5cdbd; --sage-soft: #2d3a33; --on-sage: #14201a;
+  --track: #33403a; --warn: #e6b566; --warn-soft: #3b3020; --bad: #ee9a8e; --bad-soft: #43291f;
+  --good: #93cfa9; --good-soft: #233a2c;
+    --d1: #27332c; --d2: #34483d; --d3: #4a6a58; --d4: #6b9079; --d5: #a6c6b1; --d-ink: #e8eee9; --d-ink-strong: #14201a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.page { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 96px; display: grid; gap: 24px; }
+header h1 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.25; margin: 0 0 6px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 44em; }
+.sample-note { display: inline-block; margin-top: 12px; padding: 4px 12px; border-radius: 4px; background: var(--warn-soft); color: var(--warn); font-weight: 500; font-size: .92rem; }
+.work { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; }
+.form { display: grid; gap: 28px; min-width: 0; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 14px; min-width: 0; }
+legend { font-family: var(--display); font-size: 1.25rem; font-weight: 700; padding: 0 0 8px; width: 100%; border-bottom: 1px solid var(--line); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+legend small { font-family: var(--body); font-size: .9rem; font-weight: 400; color: var(--muted); }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > label, .q { font-weight: 500; }
+input[type="text"], input[type="number"] { width: 100%; min-height: 46px; padding: 8px 12px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip span { display: flex; align-items: center; min-height: 42px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.chip input:checked + span { background: var(--sage-deep); border-color: var(--sage-deep); color: var(--bg); font-weight: 500; }
+.chip input:focus-visible + span, button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--sage); outline-offset: 2px; }
+.help { color: var(--muted); font-size: .92rem; margin: 0; }
+button { min-height: 44px; padding: 8px 16px; font: inherit; font-weight: 500; color: var(--sage-deep); background: transparent; border: 1px solid var(--sage); border-radius: 6px; cursor: pointer; justify-self: start; }
+.report { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: clamp(18px, 3vw, 30px); display: grid; gap: 22px; scroll-margin-top: 12px; }
+.report-head { display: grid; gap: 2px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+.report-head .kind { font-size: .92rem; color: var(--muted); }
+.report-head h2 { font-family: var(--display); font-size: 1.5rem; line-height: 1.35; margin: 0; }
+.result { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; }
+.score { font-family: var(--display); font-size: 4.2rem; line-height: 1; font-weight: 700; color: var(--sage-deep); font-variant-numeric: tabular-nums; }
+.score small { font-size: 1.2rem; color: var(--muted); font-weight: 400; }
+.verdict { flex: 1 1 200px; min-width: 0; }
+.verdict b { display: block; font-size: 1.2rem; }
+.verdict span { color: var(--muted); }
+.scale { display: grid; grid-template-columns: 20fr 10fr 30fr 20fr 20fr; gap: 3px; }
+.seg { min-width: 0; }
+.seg i { display: block; height: 14px; background: var(--track); overflow: hidden; }
+.seg i b { display: block; height: 100%; background: var(--sage); }
+.seg em { display: block; font-style: normal; font-size: .78rem; color: var(--muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rows { display: grid; }
+.row { display: grid; grid-template-columns: 7.5em 4.2em minmax(0, 1fr); gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.row .pts { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.row .pts small { font-weight: 400; color: var(--muted); }
+.row p { margin: 0; color: var(--muted); }
+.block h3 { font-size: 1.05rem; margin: 0 0 8px; }
+.block ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.flag { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; padding: 8px 12px; border-radius: 6px; }
+.flag b { flex: none; font-size: .9rem; }
+.flag.ok { background: var(--good-soft); } .flag.ok b { color: var(--good); }
+.flag.wait { background: var(--warn-soft); } .flag.wait b { color: var(--warn); }
+.flag.stop { background: var(--bad-soft); } .flag.stop b { color: var(--bad); }
+.summary { margin: 0; }
+.checks li { padding-left: 1.5em; text-indent: -1.5em; }
+.checks li::before { content: "□"; display: inline-block; width: 1.5em; text-indent: 0; color: var(--sage-deep); }
+.foot { border-top: 1px solid var(--line); padding-top: 12px; font-size: .9rem; color: var(--muted); }
+.foot p { margin: 0; }
+.mini { display: none; }
+.suggest { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+[hidden] { display: none !important; }
+.suggest li + li { border-top: 1px solid var(--line); }
+.suggest button { display: block; width: 100%; min-height: 44px; border: 0; border-radius: 0; color: var(--ink); text-align: left; font-weight: 400; background: transparent; }
+.suggest small { display: block; color: var(--muted); }
+.addr-state { margin: 0; font-size: .92rem; color: var(--good); }
+.addr-state.miss { color: var(--warn); }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.fact span { display: block; color: var(--muted); font-size: .9rem; }
+.fact b { font-size: 1.15rem; }
+.bars { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.bars li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3em; gap: 8px; align-items: center; }
+.bars i { display: block; height: 12px; background: var(--track); }
+.bars i b { display: block; height: 100%; background: var(--sage); }
+.bars span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.near { display: grid; gap: 4px; }
+.near li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-block: 5px; }
+.near span:last-child { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bars i { position: relative; }
+.bars i u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); text-decoration: none; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; position: sticky; top: -1px; z-index: 2; background: var(--surface); padding-block: 8px; }
+.actions button { background: var(--sage-deep); border-color: var(--sage-deep); color: var(--bg); }
+.actions button:disabled { opacity: .6; cursor: default; }
+.action-note { flex: 1 1 100%; margin: 0; color: var(--muted); font-size: .92rem; }
+.action-note:empty { display: none; }
+.report-body { display: grid; gap: 22px; min-width: 0; }
+.caution { margin: 10px 0 0; padding: 10px 12px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); font-weight: 500; }
+.map-wrap { display: grid; gap: 6px; }
+.map-wrap canvas { display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+.map-link { color: var(--sage-deep); font-weight: 500; }
+.heat { display: grid; gap: 4px; margin-top: 10px; }
+.heat.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.heat.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.heat div { padding: 10px 8px; border-radius: 4px; text-align: center; min-width: 0; }
+.heat span { display: block; font-size: .86rem; }
+.heat b { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.heat .d1 { background: var(--d1); color: var(--d-ink); } .heat .d2 { background: var(--d2); color: var(--d-ink); }
+.heat .d3 { background: var(--d3); color: var(--d-ink); } .heat .d4 { background: var(--d4); color: var(--d-ink-strong); }
+.heat .d5 { background: var(--d5); color: var(--d-ink-strong); }
+.range { position: relative; height: 14px; margin: 14px 0 8px; background: var(--track); }
+.range i { position: absolute; top: 0; bottom: 0; background: var(--sage); }
+.range u { position: absolute; top: -4px; bottom: -4px; width: 3px; background: var(--ink); text-decoration: none; }
+.ai-block { padding: 14px 16px; border-radius: 6px; background: var(--sage-soft); }
+.ai-text { white-space: pre-line; margin: 0; }
+.ai-mark { margin: 8px 0 0; color: var(--muted); font-size: .88rem; }
+.sub { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
+.trend { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.trend li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+.trend i { display: block; height: 12px; background: var(--track); }
+.trend i b { display: block; height: 100%; background: var(--sage); }
+.trend small { color: var(--muted); }
+@media (min-width: 861px) { .report { max-height: calc(100vh - 32px); overflow-y: auto; } }
+@media (max-width: 860px) {
+  .work { grid-template-columns: minmax(0, 1fr); }
+  .report { position: static; }
+  .mini { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--sage-deep); color: var(--bg); text-decoration: none; font-weight: 500; padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+@media (max-width: 460px) {
+  .row { grid-template-columns: minmax(0, 1fr) auto; }
+  .row p { grid-column: 1 / -1; }
+  .seg em { font-size: .7rem; }
+}
+@media (prefers-reduced-motion: no-preference) { .seg i b { transition: width .25s ease; } }
+</style>
+
+<div class="page">
+  <header>
+    <h1>상가 입지 리포트</h1>
+    <p>주소를 고르면 주변 동일업종, 주요상권, 행정동 유동인구가 공공데이터로 자동 입력됩니다. 지금은 마포구 주소를 찾을 수 있습니다.</p>
+    <span class="sample-note">공개용 시제품입니다. 처음 보이는 값은 예시이며, 결과는 상담 참고용입니다.</span>
+  </header>
+  <div class="work">
+    <form class="form" id="form" autocomplete="off"></form>
+    <section class="report" id="report">
+      <div class="actions">
+        <button type="button" id="aiBtn">AI 상담 문장 만들기</button>
+        <button type="button" id="pdfBtn">PDF로 저장</button>
+        <p class="action-note" id="actionNote" role="status"></p>
+      </div>
+      <div class="report-body" id="reportBody"></div>
+    </section>
+  </div>
+</div>
+<a class="mini" id="mini" href="#report"></a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="mapo-data.js?v=20261110b" charset="utf-8"></script>
+<script>
+const BIZ = {
+  cafe:    { label: "카페",   type: "cluster", fit: { young: 20, tour: 20, office: 14, local: 8 } },
+  food:    { label: "음식점", type: "cluster", fit: { young: 20, office: 20, tour: 14, local: 14 } },
+  hair:    { label: "미용실", type: "local",   fit: { local: 20, young: 14, office: 8, tour: 8 } },
+  laundry: { label: "세탁소", type: "local",   fit: { local: 20, office: 14, young: 8, tour: 8 } },
+  store:   { label: "편의점", type: "local",   fit: { local: 20, office: 20, young: 14, tour: 14 } }
+};
+const CUSTOMERS = { young: "20·30대", office: "직장인", local: "동네 주민", tour: "관광객·방문객" };
+const LOCATION = [
+  { key: "station", q: "역과의 거리", opts: [["near", "도보 5분 이내", 5], ["mid", "도보 10분 이내", 3], ["far", "도보 10분 초과", 1]] },
+  { key: "road", q: "접한 길", opts: [["main", "대로·주요 골목", 5], ["side", "일반 골목", 3], ["back", "안쪽 이면도로", 1]] },
+  { key: "access", q: "찾아오기", opts: [["easy", "쉬움", 5], ["mid", "보통", 3], ["hard", "어려움", 1]] }
+];
+const FLOORS = [["basement", "지하", 1], ["first", "1층", 5], ["second", "2층", 3], ["upper", "3층 이상", 1]];
+const VISIBILITY = [["good", "잘 보임"], ["poor", "잘 안 보임"]];
+const UPPER_OK = /학원|요가|필라테스|의원|병원|치과/;
+function upperFriendly(s) {
+  if (s.biz !== "custom") return false;
+  return [...customCats(s.customBiz)].some(i => UPPER_OK.test(DATA.cats[i]) && DATA.cats[i] !== "동물병원");
+}
+function floorScore(s) {
+  const base = s.storeFloor === "upper" && upperFriendly(s) ? 3 : FLOORS.find(f => f[0] === s.storeFloor)[2];
+  return s.visibility === "poor" ? Math.max(1, base - 2) : base;
+}
+const RENT_ZONES = [
+  ["zone1", "1권역 관문·숲길", 30, 45], ["zone2", "2권역 동진시장·끼리끼리길", 25, 30], ["zone3", "3권역 세모길·카페거리", 15, 20],
+  ["zone4", "4권역 커뮤니티센터·벚꽃길", 20, 25], ["zone5", "5권역 서측 연남로", 15, 25]
+];
+const FLOOR_RENT = { basement: 0.75, first: 1, second: 0.75, upper: 0.7 };
+const DEPOSIT_MONTHS = 20;
+function zoneFromPlace() {
+  return place && place[5] ? `zone${place[5]}` : "";
+}
+function applyZone() {
+  const box = document.getElementById("form").elements.zone;
+  if (!manual.has("zone")) state.zone = zoneFromPlace();
+  [...box].forEach(radio => { radio.checked = radio.value === state.zone; });
+  const help = document.getElementById("zoneHelp");
+  if (help) help.textContent = manual.has("zone") ? "직접 고른 권역입니다." : state.zone ? "권역 지도 기준으로 자동 선택했습니다. 다르면 직접 고르세요." : "지도의 권역 경계 밖에 있는 주소입니다. 권역을 직접 고르세요.";
+}
+const CONVERSION_RATE = 0.06;
+const FLOW = [
+  { key: "weekday", q: "오후 (11~17시)", rank: "day" },
+  { key: "evening", q: "저녁 (17~21시)", rank: "eve" },
+  { key: "weekend", q: "주말 (토·일)", rank: "end" }
+];
+const TIME_LABELS = ["0~6시", "6~11시", "11~14시", "14~17시", "17~21시", "21~24시"];
+const AGE_LABELS = ["10대", "20대", "30대", "40대", "50대", "60대 이상"];
+const AUTO_KEYS = ["compete", "weekday", "evening", "weekend", "customer", "station"];
+const FLOW_OPTS = [["high", "많음", 10], ["mid", "보통", 6], ["low", "적음", 2]];
+const COMPETE = { cluster: { dense: 6, many: 10, mid: 7, few: 4 }, local: { few: 10, mid: 6, many: 2, dense: 0 } };
+const COMPETE_LABEL = { dense: "과밀", many: "많음", mid: "보통", few: "적음" };
+const DENSE_RATIO = 2;
+const RISKS = [
+  { key: "use", label: "건축물 용도·위반건축물" },
+  { key: "utility", label: "전기·가스·배기·정화조" },
+  { key: "premium", label: "권리금 수준과 근거" },
+  { key: "landlord", label: "임대인·재건축·명도 계획" }
+];
+const RISK_OPTS = [["ok", "확인함"], ["wait", "미확인"], ["stop", "문제 있음"]];
+const FIELD_CHECKS = {
+  cluster: ["같은 업종 가게 중 손님이 많은 곳과 빈 곳을 나눠 보기", "점심과 저녁 시간에 줄이 생기는 가게 확인하기"],
+  local: ["주변 주거 세대와 기존 단골 가게 확인하기", "가까운 경쟁 점포의 영업시간과 가격 비교하기"]
+};
+const SAMPLE = {
+  address: "연남동 229-64", biz: "cafe", customer: "young", compete: "many",
+  storeFloor: "first", visibility: "good", station: "mid", road: "main", access: "easy",
+  customBiz: "", customType: "cluster", customCore: "young",
+  weekday: "mid", evening: "high", weekend: "high", rent: 450, deposit: 9000, area: 66, zone: "zone1", marketRent: 0,
+  use: "ok", utility: "wait", premium: "wait", landlord: "ok"
+};
+let state = { ...SAMPLE };
+let place = null;
+const manual = new Set();
+let depositManual = false;
+
+function rankLevel(rank) {
+  const third = DATA.pop.n / 3;
+  if (rank <= third) return "high";
+  return rank > third * 2 ? "low" : "mid";
+}
+function applyDong(dong) {
+  FLOW.forEach(item => {
+    if (!manual.has(item.key)) state[item.key] = rankLevel(dong[item.rank]);
+  });
+  if (!manual.has("customer")) state.customer = rankLevel(dong.ry) === "high" ? "young" : "local";
+}
+
+const RADIUS = 300;
+const METERS = { lat: 1.11195, lng: 1.11195 * Math.cos(37.55 * Math.PI / 180) };
+const cleanAddress = t => String(t).replace(/서울특별시|서울시|서울|마포구|\s/g, "");
+const ADDRESS_INDEX = new Map();
+DATA.addr.forEach(a => {
+  ADDRESS_INDEX.set(cleanAddress(a[0]), a);
+  if (a[1]) ADDRESS_INDEX.set(cleanAddress(a[1]), a);
+});
+function findAddress(text) {
+  return ADDRESS_INDEX.get(cleanAddress(text)) || null;
+}
+function suggestAddresses(text) {
+  const key = cleanAddress(text);
+  if (key.length < 2) return [];
+  const found = [];
+  for (const a of DATA.addr) {
+    if (cleanAddress(a[0]).includes(key) || cleanAddress(a[1]).includes(key)) found.push(a);
+    if (found.length === 6) break;
+  }
+  return found;
+}
+function meters(lat1, lng1, lat2, lng2) {
+  return Math.hypot((lat1 - lat2) * METERS.lat, (lng1 - lng2) * METERS.lng);
+}
+const WALK_MPM = 80;
+function stationInfo(a) {
+  if (!DATA.stations || !(a[7] >= 0)) return null;
+  const min = Math.max(1, Math.ceil(a[7] / WALK_MPM));
+  return { name: DATA.stations[a[6]][0], walk: a[7], min, level: min <= 5 ? "near" : min <= 10 ? "mid" : "far" };
+}
+const ALIASES = { 베이커리: "빵/도넛", 빵집: "빵/도넛", 제과점: "빵/도넛", 술집: "요리 주점", 네일: "네일숍", 안경점: "안경렌즈", 옷가게: "의류 소매업", 필라테스: "요가/필라테스", 요가: "요가/필라테스" };
+const squeeze = t => String(t).replace(/\s/g, "");
+function customCats(text) {
+  const key = squeeze(text);
+  const found = new Set();
+  if (!key) return found;
+  const word = squeeze(ALIASES[key] || key);
+  DATA.cats.forEach((c, i) => { if (squeeze(c).includes(word)) found.add(i); });
+  return found;
+}
+function bizInfo(s) {
+  if (s.biz !== "custom") return BIZ[s.biz];
+  const fit = Object.fromEntries(Object.keys(CUSTOMERS).map(k => [k, k === s.customCore ? 20 : 10]));
+  return { label: s.customBiz.trim() || "직접 입력 업종", type: s.customType, fit };
+}
+function bizMatcher(s) {
+  if (s.biz !== "custom") return shop => shop[3] === s.biz;
+  const found = customCats(s.customBiz);
+  if (found.size) return shop => found.has(shop[2]);
+  const word = s.customBiz.trim();
+  return word ? shop => shop[4].includes(word) : null;
+}
+const thresholdCache = new Map();
+function thresholds(s) {
+  if (s.biz !== "custom") return DATA.th[s.biz];
+  const key = s.customBiz.trim();
+  if (thresholdCache.has(key)) return thresholdCache.get(key);
+  const matcher = bizMatcher(s);
+  const list = matcher ? DATA.shops.filter(matcher) : [];
+  let result = null;
+  if (list.length) {
+    const counts = [];
+    for (let i = 0; i < DATA.addr.length; i += 8) {
+      const a = DATA.addr[i];
+      counts.push(list.reduce((n, shop) => n + (meters(a[2], a[3], shop[0], shop[1]) <= RADIUS ? 1 : 0), 0));
+    }
+    counts.sort((x, y) => x - y);
+    result = { low: counts[Math.floor(counts.length / 3)], high: counts[Math.floor(counts.length * 2 / 3)] };
+  }
+  thresholdCache.set(key, result);
+  return result;
+}
+function competeLevel(t, count) {
+  if (count <= t.low) return "few";
+  if (count >= t.high * DENSE_RATIO) return "dense";
+  return count >= t.high ? "many" : "mid";
+}
+function surroundings(a, s) {
+  const lat = a[2], lng = a[3];
+  const matcher = bizMatcher(s), t = thresholds(s);
+  const near = [], counts = {};
+  let total = 0;
+  DATA.shops.forEach(shop => {
+    const d = meters(lat, lng, shop[0], shop[1]);
+    if (d > RADIUS) return;
+    if (matcher && matcher(shop)) near.push({ name: shop[4], floor: shop[5], d });
+    if (DATA.catLife[shop[2]]) {
+      total += 1;
+      const cat = DATA.cats[shop[2]];
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+  });
+  near.sort((x, y) => x.d - y.d);
+  const top = Object.entries(counts).sort((x, y) => y[1] - x[1]).slice(0, 5);
+  return { count: near.length, noMatch: !t, level: t ? competeLevel(t, near.length) : null, near: near.slice(0, 5), top, total };
+}
+function insideRing(lat, lng, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [ay, ax] = ring[i], [by, bx] = ring[j];
+    if ((ay > lat) !== (by > lat) && lng < (bx - ax) * (lat - ay) / (by - ay) + ax) inside = !inside;
+  }
+  return inside;
+}
+function majorArea(a) {
+  const hit = DATA.areas.find(area => area[1].some(ring => insideRing(a[2], a[3], ring)));
+  return hit ? hit[0] : "주요상권 밖";
+}
+function floorLabel(f) {
+  if (!f) return "층 정보 없음";
+  if (f === "지") return "지하";
+  return /^\d+$/.test(f) ? `${f}층` : f;
+}
+
+function inYeonnam() {
+  return Boolean(place && (place[5] || place[0].startsWith("연남동")));
+}
+function rentRangeScore(s, pyeong, band) {
+  const ratio = FLOOR_RENT[s.storeFloor];
+  const low = band.low * ratio * pyeong, high = band.high * ratio * pyeong;
+  const standardDeposit = s.rent * DEPOSIT_MONTHS;
+  const deposit = s.deposit > 0 ? s.deposit : standardDeposit;
+  const converted = s.rent + (deposit - standardDeposit) * CONVERSION_RATE / 12;
+  let pts = 3, position = "범위보다 많이 높습니다";
+  if (converted < low) { pts = 16; position = "범위보다 낮습니다"; }
+  else if (converted <= high) { pts = 20; position = "범위 안에 있습니다"; }
+  else if (converted <= high * 1.2) { pts = 9; position = "범위보다 조금 높습니다"; }
+  return { pts, gap: converted / ((low + high) / 2) - 1, pyeong, unit: s.rent / pyeong, range: { zone: band.label, band, low, high, deposit, converted, position, below: converted < low } };
+}
+function priceScore(s) {
+  const { rent, area, marketRent: market } = s;
+  const pyeong = area / 3.3058;
+  const unit = rent > 0 && area > 0 ? rent / pyeong : null;
+  if (unit !== null && inYeonnam() && s.zone) {
+    const zone = RENT_ZONES.find(z => z[0] === s.zone);
+    return rentRangeScore(s, pyeong, { label: zone[1], low: zone[2], high: zone[3] });
+  }
+  if (unit !== null && !(market > 0)) {
+    const band = rentBand();
+    if (band) return rentRangeScore(s, pyeong, band);
+  }
+  if (unit === null || !(market > 0)) return { pts: 0, gap: null, pyeong, unit };
+  const gap = unit / market - 1;
+  let pts = 3;
+  if (gap < -0.15) pts = 16; else if (gap <= 0.05) pts = 20; else if (gap <= 0.2) pts = 9;
+  return { pts, gap, pyeong, unit };
+}
+function calculate(s) {
+  const biz = bizInfo(s);
+  const location = LOCATION.reduce((sum, item) => sum + item.opts.find(o => o[0] === s[item.key])[2], floorScore(s));
+  const compete = COMPETE[biz.type][s.compete];
+  const flow = FLOW.reduce((sum, item) => sum + FLOW_OPTS.find(o => o[0] === s[item.key])[2], 0);
+  const customer = biz.fit[s.customer];
+  const price = priceScore(s);
+  const earned = location + compete + flow + customer;
+  const priceKnown = price.gap !== null;
+  const total = priceKnown ? earned + price.pts : Math.round(earned / 80 * 100);
+  const stops = RISKS.filter(r => s[r.key] === "stop");
+  const waits = RISKS.filter(r => s[r.key] === "wait");
+  return { location, compete, flow, customer, price, priceKnown, total, stops, waits };
+}
+function verdict(r) {
+  if (r.stops.length) return ["계약 전 해결 필요", `점수와 별도로 문제 ${r.stops.length}건을 먼저 풀어야 합니다.`];
+  const check = r.waits.length ? `현장 확인 ${r.waits.length}건이 남았습니다.` : "확인 항목을 모두 마쳤습니다.";
+  const tail = r.priceKnown ? check : `${check} 가격을 뺀 80점을 100점으로 환산했습니다.`;
+  if (r.total >= 80) return ["적극 검토", tail];
+  if (r.total >= 60) return ["조건 확인 후 검토", tail];
+  return ["신중 검토", tail];
+}
+const topic = w => w + ((w.charCodeAt(w.length - 1) - 0xAC00) % 28 ? "은" : "는");
+const esc = t =>String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function chips(name, opts) {
+  return `<div class="chips">${opts.map(o => `<label class="chip"><input type="radio" id="${name}-${o[0]}" name="${name}" value="${o[0]}"><span>${o[1]}</span></label>`).join("")}</div>`;
+}
+function buildForm() {
+  document.getElementById("form").innerHTML = `
+    <fieldset><legend>기본 정보</legend>
+      <div class="field"><label for="address">주소 (지번 또는 도로명)</label><input type="text" id="address" name="address">
+        <ul class="suggest" id="suggest" hidden></ul><p class="addr-state" id="addrState"></p></div>
+      <div class="field" id="zoneBox"><span class="q">연남동 권역</span>${chips("zone", RENT_ZONES)}
+        <p class="help" id="zoneHelp"></p><p class="help">메디넷부동산의 현장 경험을 바탕으로 권역별 적정 범위를 계산합니다.</p></div>
+      <div class="field"><span class="q">희망 업종</span>${chips("biz", [...Object.entries(BIZ).map(([k, v]) => [k, v.label]), ["custom", "직접 입력"]])}</div>
+      <div class="field" id="customBox" hidden>
+        <label for="customBiz">업종 직접 입력</label><input type="text" id="customBiz" name="customBiz" placeholder="예: 꽃집, 베이커리, 필라테스">
+        <ul class="suggest" id="bizSuggest" hidden></ul><p class="addr-state" id="bizState"></p>
+        <span class="q">같은 업종이 많으면</span>${chips("customType", [["cluster", "모일수록 유리"], ["local", "많으면 불리"]])}
+        <span class="q">이 업종의 핵심 고객</span>${chips("customCore", Object.entries(CUSTOMERS))}
+      </div>
+      <div class="field"><span class="q">층수</span>${chips("storeFloor", FLOORS)}</div>
+      <div class="two">
+        <div class="field"><label for="rent">희망 월세 (만원, 직접 입력)</label><input type="number" id="rent" name="rent" min="0" inputmode="decimal"></div>
+        <div class="field"><label for="area">전용면적 (㎡)</label><input type="number" id="area" name="area" min="0" step="0.1" inputmode="decimal"></div>
+      </div>
+      <p class="help" id="areaHelp"></p>
+      <div class="field"><label for="deposit">보증금 (만원, 선택)</label><input type="number" id="deposit" name="deposit" min="0" inputmode="decimal">
+        <p class="help" id="depositHelp"></p></div>
+    </fieldset>
+    <fieldset><legend>입지 <small>30점</small></legend>
+      ${LOCATION.map(i => `<div class="field"><span class="q">${i.q}</span>${chips(i.key, i.opts)}${i.key === "station" ? `<p class="help" id="stationHelp"></p>` : ""}</div>`).join("")}
+      <div class="field"><span class="q">밖에서 보이는 정도</span>${chips("visibility", VISIBILITY)}</div>
+      <div class="field"><span class="q">주변 동일업종</span>${chips("compete", Object.entries(COMPETE_LABEL).reverse())}
+      <p class="help" id="competeHelp"></p></div>
+    </fieldset>
+    <fieldset><legend>유동인구 <small>30점</small></legend>
+      ${FLOW.map(i => `<div class="field"><span class="q">${i.q}</span>${chips(i.key, FLOW_OPTS)}</div>`).join("")}
+      <p class="help">서울 ${DATA.pop.n}개 행정동을 3등분해 상위는 많음, 하위는 적음으로 자동 선택합니다. 동 전체의 값이며, 직접 바꿀 수 있습니다.</p>
+    </fieldset>
+    <fieldset><legend>주 고객층 <small>20점</small></legend>
+      <div class="field"><span class="q">이 자리의 주 고객</span>${chips("customer", Object.entries(CUSTOMERS))}</div>
+      <p class="help">20·30대 비중이 서울 상위 1/3이면 20·30대로 자동 선택합니다. 직장인과 관광객은 자료가 없어 직접 고릅니다.</p>
+    </fieldset>
+    <fieldset><legend>가격 수준 <small>20점</small></legend>
+      <div class="field" id="marketBox"><label for="marketRent">주변 평균 평당 월세 (만원, 선택)</label><input type="number" id="marketRent" name="marketRent" min="0" step="0.1" inputmode="decimal">
+        <p class="help">비워 두면 한국부동산원 상권 임대료로 적정 월세를 추정합니다. 현장 시세를 아시면 넣으세요. 넣은 값이 추정값보다 우선합니다.</p></div>
+    </fieldset>
+    <fieldset><legend>계약 전 확인 <small>점수 제외</small></legend>
+      ${RISKS.map(i => `<div class="field"><span class="q">${i.label}</span>${chips(i.key, RISK_OPTS)}</div>`).join("")}
+    </fieldset>
+    <button type="button" id="reset">예시로 되돌리기</button>`;
+}
+function fillForm() {
+  const form = document.getElementById("form");
+  Object.entries(state).forEach(([key, value]) => {
+    const field = form.elements[key];
+    if (field) field.value = value;
+  });
+}
+function row(name, pts, max, why) {
+  return `<div class="row"><b>${name}</b><span class="pts">${pts}<small>/${max}</small></span><p>${why}</p></div>`;
+}
+function seg(name, pts, max) {
+  return `<div class="seg"><i><b style="width:${pts / max * 100}%"></b></i><em>${name}</em></div>`;
+}
+let currentFacts = "", aiFacts = "", aiText = "", aiBusy = false, aiControl = null;
+let sample = null, downloads = null;
+
+function aiBlock() {
+  if (aiFacts !== currentFacts || (!aiText && !aiBusy)) return "";
+  return `<div class="block ai-block"><h3>AI 상담 문장</h3><p class="ai-text" id="aiText">${esc(aiText || "작성 중입니다.")}</p><p class="ai-mark">AI 초안입니다. 손님에게 전하기 전에 내용을 확인하세요.</p></div>`;
+}
+function aiPrompt(facts) {
+  return `당신은 상가 전문 공인중개사의 상담 문장을 돕습니다. 아래 자료만 근거로 손님에게 설명할 문장을 한국어 존댓말로 쓰세요.
+
+규칙:
+- 자료에 없는 숫자나 사실을 만들지 않습니다.
+- 매출, 수익, 창업 성공을 예측하거나 보장하지 않습니다.
+- 유동인구는 가게 앞이 아니라 행정동 전체 값이라고 밝힙니다.
+- 계약 전 확인에서 미확인이나 문제 있음인 항목은 계약 전에 확인할 일로 짚습니다.
+- 적정 월세를 말할 때는 위치와 건물에 따라 실제 임대료와 차이가 있을 수 있다고 밝힙니다.
+- 마크다운 기호 없이 일반 글로 씁니다.
+
+형식:
+요약: 2~3문장
+좋은 점: 두 가지
+주의할 점: 두 가지
+다음에 확인할 질문: 두 가지
+
+자료:
+${facts}`;
+}
+function setNote(text) {
+  document.getElementById("actionNote").textContent = text;
+}
+function aiErrorText(code) {
+  if (code === "rate_limited") return "지금은 사용량이 많습니다. 잠시 후 다시 눌러 주세요.";
+  if (code === "session_expired") return "다시 로그인한 뒤 눌러 주세요.";
+  return "AI 문장을 만들지 못했습니다. 잠시 후 다시 눌러 주세요.";
+}
+async function askAi() {
+  const button = document.getElementById("aiBtn");
+  if (aiBusy) { aiControl?.abort(); return; }
+  if (!sample && window.claude) sample = await window.claude.use("sample");
+  if (!sample) { setNote("이 화면에서는 AI 문장을 쓸 수 없습니다. 컴퓨터 인터넷 창에서 claude.ai로 이 페이지를 열어 주세요."); return; }
+  const again = aiFacts === currentFacts && aiText;
+  aiFacts = currentFacts; aiText = ""; aiBusy = true;
+  aiControl = new AbortController();
+  button.textContent = "작성 멈추기";
+  setNote("");
+  render();
+  try {
+    const options = {
+      signal: aiControl.signal,
+      onText: ({ text }) => {
+        aiText = text;
+        const box = document.getElementById("aiText");
+        if (box) box.textContent = text;
+      }
+    };
+    if (again) options.cache = false;
+    const result = await sample(aiPrompt(aiFacts), options);
+    aiText = result.text;
+    if (result.truncated) setNote("글이 길어 중간에 끊겼습니다. 다시 눌러 주세요.");
+  } catch (e) {
+    aiText = e.text ?? "";
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e.code)) {
+      setNote(e.code === "not_granted" ? "AI 사용이 허용되지 않았습니다. 페이지를 새로 고침한 뒤 이 버튼을 누르고 허용해 주세요." : "이 화면에서는 AI 문장을 쓸 수 없습니다. 상담 요약은 그대로 볼 수 있습니다.");
+    } else if (e.code !== "cancelled") {
+      setNote(aiErrorText(e.code));
+    }
+  } finally {
+    aiBusy = false;
+    button.textContent = aiFacts === currentFacts && aiText ? "AI 문장 다시 만들기" : "AI 상담 문장 만들기";
+    render();
+  }
+}
+async function reportPdf() {
+  const source = document.getElementById("reportBody");
+  const holder = document.createElement("div");
+  holder.className = "report-body";
+  holder.style.cssText = "position:fixed;left:-20000px;top:0;width:720px";
+  holder.innerHTML = source.innerHTML;
+  document.body.appendChild(holder);
+  const sourceMaps = source.querySelectorAll("canvas"), copyMaps = holder.querySelectorAll("canvas");
+  sourceMaps.forEach((map, i) => copyMaps[i].getContext("2d").drawImage(map, 0, 0));
+  copyMaps.forEach(map => { map.style.width = map.id === "zoneMap" ? "55%" : "85%"; map.style.margin = "0 auto"; });
+  const margin = 10, width = 190, height = 277, gap = 5;
+  const pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+  let y = margin;
+  try {
+    for (const part of [...holder.children]) {
+      const canvas = await html2canvas(part, {
+        scale: 2, backgroundColor: "#ffffff", useCORS: true,
+        onclone: doc => doc.documentElement.setAttribute("data-theme", "light")
+      });
+      const fullHeight = canvas.height * width / canvas.width;
+      if (y > margin && y + fullHeight > margin + height) { pdf.addPage(); y = margin; }
+      let top = 0;
+      while (top < canvas.height) {
+        const room = Math.floor((margin + height - y) * canvas.width / width);
+        const piece = Math.min(room, canvas.height - top);
+        const page = document.createElement("canvas");
+        page.width = canvas.width; page.height = piece;
+        const ctx = page.getContext("2d");
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, page.width, page.height);
+        ctx.drawImage(canvas, 0, -top);
+        const pieceHeight = piece * width / canvas.width;
+        pdf.addImage(page.toDataURL("image/jpeg", 0.92), "JPEG", margin, y, width, pieceHeight);
+        top += piece; y += pieceHeight + gap;
+        if (top < canvas.height) { pdf.addPage(); y = margin; }
+      }
+    }
+  } finally {
+    holder.remove();
+  }
+  const pages = pdf.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    pdf.setPage(i); pdf.setFontSize(9); pdf.setTextColor(120);
+    pdf.text(`${i} / ${pages}`, 105, 292, { align: "center" });
+  }
+  return pdf;
+}
+async function savePdf() {
+  const button = document.getElementById("pdfBtn");
+  if (!window.html2canvas || !window.jspdf) { setNote("PDF 도구를 불러오지 못했습니다. 페이지를 새로 고침해 주세요."); return; }
+  if (!downloads && window.claude) downloads = await window.claude.use("downloads");
+  if (window.claude && !downloads) { setNote("이 화면에서는 PDF를 저장할 수 없습니다. 컴퓨터 인터넷 창에서 claude.ai로 이 페이지를 열어 주세요."); return; }
+  button.disabled = true;
+  setNote("PDF를 만들고 있습니다.");
+  try {
+    const pdf = await reportPdf();
+    const name = `상가입지리포트_${state.address.replace(/[\\/:*?"<>|]/g, "").trim() || "주소없음"}.pdf`;
+    if (window.claude) {
+      await downloads.save({ filename: name, data: pdf.output("blob") });
+      setNote("PDF 저장을 요청했습니다.");
+    } else {
+      pdf.save(name);
+      setNote("PDF 저장을 요청했습니다.");
+    }
+  } catch (e) {
+    setNote(e?.code === "declined" ? "저장을 취소했습니다." : "PDF를 만들지 못했습니다. 다시 눌러 주세요.");
+  } finally {
+    button.disabled = false;
+  }
+}
+function startActions() {
+  const aiButton = document.getElementById("aiBtn");
+  const pdfButton = document.getElementById("pdfBtn");
+  aiButton.addEventListener("click", askAi);
+  pdfButton.addEventListener("click", savePdf);
+  if (!window.claude) { aiButton.hidden = true; return; }  // AI 문장은 claude.ai 안에서만 됩니다
+  window.claude.use("sample").then(found => { sample = found; }).catch(() => {});
+  window.claude.use("downloads").then(found => { downloads = found; }).catch(() => {});
+}
+
+const SRC = { shops: "2026년 9월", areas: "2024년 1월 1일", reb: "2026년 2분기", trdar: "2021년~2026년", ...(DATA.meta || {}) };
+const won = n => `${Math.round(n).toLocaleString()}만원`;
+const REB_RENT = DATA.reb || { "동교/연남": [56.6, 55.2], "홍대/합정": [63.6, 60.6], "망원역": [41.3, 40.6], "공덕역": [59.8, 59.1], "신촌/이대": [40.8, 40.8] };
+const DONG_TO_REB = { 연남동: "동교/연남", 동교동: "동교/연남", 서교동: "홍대/합정", 합정동: "홍대/합정", 상수동: "홍대/합정", 망원동: "망원역", 공덕동: "공덕역", 신공덕동: "공덕역", 노고산동: "신촌/이대" };
+// 부동산원 조사 상권이 없는 동은 가장 가까운 상권, 상암동은 영등포신촌 권역 평균을 씁니다.
+const DONG_NEAR_REB = { 성산동: "망원역", 중동: "망원역", 당인동: "홍대/합정", 창전동: "신촌/이대", 신수동: "신촌/이대", 대흥동: "신촌/이대", 염리동: "신촌/이대", 구수동: "신촌/이대", 현석동: "신촌/이대", 신정동: "신촌/이대", 하중동: "신촌/이대", 아현동: "공덕역", 도화동: "공덕역", 용강동: "공덕역", 마포동: "공덕역", 토정동: "공덕역", 상암동: "영등포신촌" };
+// 현장 시세를 아는 동은 여기에 넣으면 부동산원 추정 대신 씁니다. 1층 전용 평당 월세(만원) 예: 망원동: [12, 20]
+const FIELD_RENT = {};
+function rebRent() {
+  if (!place) return null;
+  const dong = place[0].split(" ")[0];
+  const name = DONG_TO_REB[dong] || DONG_NEAR_REB[dong];
+  if (!name || !REB_RENT[name]) return null;
+  const [now, before] = REB_RENT[name];
+  return { name, near: !DONG_TO_REB[dong], pyeong: now * 3.3058 / 10, change: (now / before - 1) * 100 };
+}
+let rebScaleCache = null;
+function rebScale() {
+  if (rebScaleCache) return rebScaleCache;
+  let n = 0, low = 0, high = 0;
+  DATA.addr.forEach(a => {
+    const zone = a[5] && RENT_ZONES[a[5] - 1];
+    if (zone) { n += 1; low += zone[2]; high += zone[3]; }
+  });
+  const base = REB_RENT["동교/연남"][0] * 3.3058 / 10;
+  rebScaleCache = { low: low / n / base, high: high / n / base };
+  return rebScaleCache;
+}
+function rentBand() {
+  if (!place) return null;
+  const dong = place[0].split(" ")[0];
+  if (FIELD_RENT[dong]) return { label: `${dong} 현장 시세`, low: FIELD_RENT[dong][0], high: FIELD_RENT[dong][1] };
+  const reb = rebRent();
+  if (!reb) return null;
+  const k = rebScale();
+  return { label: `${reb.name} 상권 기준 추정`, low: reb.pyeong * k.low, high: reb.pyeong * k.high, est: true, near: reb.near, name: reb.name, k };
+}
+function rebBlock() {
+  const reb = rebRent();
+  if (!reb) return "";
+  const change = `${reb.change > 0 ? "+" : ""}${reb.change.toFixed(1)}%`;
+  return `<div class="block"><h3>공공 참고 임대료</h3>
+    <div class="facts">
+      <div class="fact"><span>${esc(reb.name)} 상권 평당 임대료</span><b>${reb.pyeong.toFixed(1)}만원</b></div>
+      <div class="fact"><span>1년 전 같은 분기 대비</span><b>${change}</b></div>
+    </div>
+    <p class="sub" style="margin-top:8px">한국부동산원 ${SRC.reb} 소규모 상가. 1층, 전용+공용 면적, 보증금 환산 포함 기준이라 전용 평당 월세와 직접 비교할 수 없습니다. ${reb.near ? "이 동은 부동산원 조사 상권 밖이라 가까운 상권 값을 보여 줍니다. " : ""}${!(inYeonnam() && state.zone) && !(state.marketRent > 0) && rentBand()?.est ? "이 값을 환산해 적정 월세 범위를 추정했습니다." : "점수에는 넣지 않습니다."}</p>
+  </div>`;
+}
+function priceBlock(range) {
+  if (!range) return "";
+  const max = Math.max(range.high * 1.3, range.converted * 1.1);
+  const pct = n => n / max * 100;
+  const adjusted = Math.abs(range.converted - state.rent) >= 1 ? `, 보증금 반영 ${won(range.converted)}` : "";
+  return `<div class="block"><h3>적정 월세 범위</h3>
+    <div class="facts">
+      <div class="fact"><span>${esc(range.zone)} 적정 월세</span><b>${won(range.low)} ~ ${won(range.high)}</b></div>
+      <div class="fact"><span>입력 월세${adjusted}</span><b>${won(state.rent)}</b></div>
+    </div>
+    <div class="range" role="img" aria-label="적정 월세 ${won(range.low)}에서 ${won(range.high)}, 입력 월세 ${won(range.converted)}"><i style="left:${pct(range.low)}%;width:${pct(range.high - range.low)}%"></i><u style="left:${pct(range.converted)}%"></u></div>
+    <p class="sub">막대: 적정 범위, 검은 눈금: 입력 월세. 입력 월세는 ${range.position}. 보증금 ${won(range.deposit)} 기준입니다.</p>
+    <p class="caution">★ 주의: 위치와 건물에 따라 실제 임대료와 차이가 있을 수 있습니다. 이 범위는 참고용입니다.</p>
+    ${range.band.est ? `<p class="sub">연남동 현장 시세가 한국부동산원 동교/연남 임대료의 ${range.band.k.low.toFixed(2)}~${range.band.k.high.toFixed(2)}배인 점을 ${esc(range.band.name)} 임대료에 적용한 추정입니다.${range.band.near ? " 이 동은 조사 상권 밖이라 오차가 더 클 수 있습니다." : ""} 현장 시세를 아시면 왼쪽 '주변 평균 평당 월세'에 넣으세요.</p>` : ""}
+    ${range.below ? `<p class="summary">시세보다 낮은 이유가 있는지 위치, 권리금, 건물 상태, 임대인 조건을 확인하세요.</p>` : ""}
+  </div>`;
+}
+// ── 서울시 상권분석서비스: 상권 5년 흐름 ──
+const TRDAR_NEAR = 100;  // 경계 밖이어도 이 거리(m) 안이면 가장 가까운 상권의 흐름을 보여 줍니다
+const TRDAR_SHAPE = (DATA.trdar || []).map(t => (t[6] || []).map(flat => {
+  const ring = [[flat[0], flat[1]]];
+  for (let i = 2; i < flat.length; i += 2) {
+    const [y, x] = ring[ring.length - 1];
+    ring.push([y + flat[i], x + flat[i + 1]]);
+  }
+  return ring;
+}));
+function ringDistance(lat, lng, ring) {
+  let best = Infinity;
+  for (let i = 1; i < ring.length; i++) {
+    const ax = (ring[i - 1][1] - lng) * METERS.lng, ay = (ring[i - 1][0] - lat) * METERS.lat;
+    const bx = (ring[i][1] - lng) * METERS.lng, by = (ring[i][0] - lat) * METERS.lat;
+    const dx = bx - ax, dy = by - ay, len = dx * dx + dy * dy;
+    const u = len ? Math.min(1, Math.max(0, -(ax * dx + ay * dy) / len)) : 0;
+    best = Math.min(best, Math.hypot(ax + u * dx, ay + u * dy));
+  }
+  return best;
+}
+function trdarFor(a) {
+  if (!DATA.trdar || !a) return null;
+  let inside = null, near = null;
+  DATA.trdar.forEach((t, i) => {
+    const rings = TRDAR_SHAPE[i];
+    if (!rings.length) return;
+    if (rings.filter(r => insideRing(a[2], a[3], r)).length % 2) {
+      if (!inside || inside.t[2] === "전통시장") inside = { t, i, d: 0, inside: true };   // 겹치면 전통시장보다 골목·발달상권을 우선합니다
+      return;
+    }
+    const d = Math.min(...rings.map(r => ringDistance(a[2], a[3], r)));
+    if (!near || d < near.d) near = { t, i, d, inside: false };
+  });
+  return inside || near;
+}
+function lastQuarters(n) { return DATA.tq.map((q, i) => i).slice(-n); }
+function recentStat(st) {
+  const ix = lastQuarters(4);
+  const avgN = ix.reduce((s, i) => s + st.n[i], 0) / ix.length;
+  const sold = ix.filter(i => st.n[i] > 0 && st.s[i] > 0);
+  return {
+    now: st.n[ix[ix.length - 1]],
+    open: ix.reduce((s, i) => s + st.o[i], 0), close: ix.reduce((s, i) => s + st.c[i], 0),
+    openRate: avgN ? ix.reduce((s, i) => s + st.o[i], 0) / avgN * 100 : null,
+    closeRate: avgN ? ix.reduce((s, i) => s + st.c[i], 0) / avgN * 100 : null,
+    per: sold.length ? sold.reduce((s, i) => s + st.s[i] / st.n[i], 0) / sold.length : null
+  };
+}
+function mapoStat(biz) {
+  const ix = lastQuarters(4);
+  let n = 0, c = 0, s = 0, ns = 0;
+  Object.values(DATA.tstat).forEach(v => {
+    const st = v[biz]; if (!st) return;
+    ix.forEach(i => { n += st.n[i]; c += st.c[i]; if (st.s[i] > 0) { s += st.s[i]; ns += st.n[i]; } });
+  });
+  return { closeRate: n ? c / (n / ix.length) * 100 : null, per: ns ? s / ns : null };
+}
+function yearStat(st) {
+  const years = {};
+  DATA.tq.forEach((q, i) => { (years[q.slice(0, 4)] = years[q.slice(0, 4)] || []).push(i); });
+  return Object.entries(years).filter(([, ix]) => ix.length === 4).slice(-5).map(([y, ix]) => ({
+    y, n: st.n[ix[3]], open: ix.reduce((s, i) => s + st.o[i], 0), close: ix.reduce((s, i) => s + st.c[i], 0)
+  }));
+}
+function trendInfo(biz) {
+  const hit = trdarFor(place);
+  if (!hit || !DATA.tstat) return null;
+  const [code, name, kind] = hit.t;
+  const st = DATA.tstat[code]?.[biz];
+  if (!hit.inside && hit.d > TRDAR_NEAR) return { name, kind, far: true, d: hit.d };
+  return { name, kind, inside: hit.inside, d: hit.d, st, recent: st ? recentStat(st) : null, years: st ? yearStat(st) : [], mapo: mapoStat(biz) };
+}
+function trendBlock(biz, info) {
+  if (state.biz === "custom") return "";
+  if (!info) return "";
+  if (info.far) return `<div class="block"><h3>상권 5년 흐름</h3><p class="summary">서울시 상권분석서비스의 공식 상권 경계 밖에 있는 주소입니다. 가장 가까운 상권은 ${esc(info.name)}이고, 경계까지 약 ${Math.round(info.d / 10) * 10}m입니다.</p></div>`;
+  const where = info.inside ? `${esc(info.name)} <small>(${esc(info.kind)})</small>` : `${esc(info.name)} <small>(경계 밖 ${Math.round(info.d)}m)</small>`;
+  if (!info.st || !info.years.length) return `<div class="block"><h3>상권 5년 흐름</h3><p class="summary">${where}에는 ${biz.label} 자료가 없습니다.</p></div>`;
+  const r = info.recent, m = info.mapo, ys = info.years;
+  const max = Math.max(...ys.map(y => y.n), 1);
+  const pct = v => v === null ? "-" : `${v.toFixed(1)}%`;
+  const first = ys[0], last = ys[ys.length - 1];
+  const avgOpen = ys.reduce((s, y) => s + y.open, 0) / ys.length, avgClose = ys.reduce((s, y) => s + y.close, 0) / ys.length;
+  const move = last.n === first.n ? "그대로였고" : `${first.n}곳에서 ${last.n}곳으로 ${last.n > first.n ? "늘었고" : "줄었고"}`;
+  const salesFact = r.per ? `<div class="fact"><span>점포당 월평균 추정매출 (최근 1년)</span><b>${won(r.per)}</b><span>마포구 평균 ${m.per ? won(m.per) : "-"}</span></div>` : "";
+  return `<div class="block"><h3>상권 5년 흐름</h3>
+    <div class="facts">
+      <div class="fact"><span>${info.inside ? "이 자리가 속한 상권" : "가장 가까운 상권"}</span><b>${where}</b></div>
+      <div class="fact"><span>상권 안 ${biz.label}</span><b>${r.now}곳</b></div>
+      ${salesFact}
+      <div class="fact"><span>연 폐업률 (최근 1년)</span><b>${pct(r.closeRate)}</b><span>마포구 평균 ${pct(m.closeRate)}, 연 개업률 ${pct(r.openRate)}</span></div>
+    </div>
+    <p class="summary" style="margin-top:10px">${first.y}년부터 ${last.y}년까지 ${topic(biz.label)} ${move}, 해마다 평균 ${avgOpen.toFixed(1)}곳이 문을 열고 ${avgClose.toFixed(1)}곳이 문을 닫았습니다.</p>
+    <ul class="trend" aria-label="연도별 점포 수와 개업, 폐업">${ys.map(y => `<li><span>${y.y}</span><i><b style="width:${y.n / max * 100}%"></b></i><span>${y.n}곳 <small>개업 ${y.open} · 폐업 ${y.close}</small></span></li>`).join("")}</ul>
+    ${r.now < 10 ? `<p class="caution">점포가 ${r.now}곳뿐이라 개업률, 폐업률, 매출 평균이 한두 곳의 변화에도 크게 달라집니다. 참고로만 보세요.</p>` : ""}
+    <p class="sub" style="margin-top:8px">서울시 상권분석서비스 ${esc(SRC.trdar)}. 막대는 그해 4분기 점포 수입니다. 상권은 서울시 공식 상권 경계${SRC.bounds ? `(${esc(SRC.bounds)} 파일)` : ""}로 찾았습니다. 매출은 카드 결제 등을 바탕으로 한 추정치라 실제 매출과 다를 수 있습니다.</p>
+  </div>`;
+}
+function compareBars(labels, mine, seoul) {
+  const max = Math.max(...mine, ...seoul);
+  return `<ul class="bars">${labels.map((label, i) => `<li title="${label}: 이 동 ${mine[i]}%, 서울 평균 ${seoul[i]}%"><span>${label}</span><i><b style="width:${mine[i] / max * 100}%"></b><u style="left:${seoul[i] / max * 100}%"></u></i><span>${mine[i].toFixed(1)}%</span></li>`).join("")}</ul>`;
+}
+function heatClass(v) {
+  if (v < 0.75) return "d1";
+  if (v < 1) return "d2";
+  if (v < 1.25) return "d3";
+  return v < 1.75 ? "d4" : "d5";
+}
+function heatCell(label, v) {
+  return `<div class="${heatClass(v)}"><span>${label}</span><b>${v.toFixed(2)}배</b></div>`;
+}
+function denseSummary(d) {
+  const times = [["오전", d.am], ["오후", d.pm], ["저녁", d.eve]].sort((a, b) => b[1] - a[1]);
+  const gap = Math.round(Math.abs(d.we / d.wk - 1) * 100);
+  const week = gap < 3 ? "평일과 주말의 차이는 크지 않습니다" : `주말이 평일보다 ${gap}% ${d.we > d.wk ? "많습니다" : "적습니다"}`;
+  const subject = w => w + (w === "오후" ? "가" : "이");
+  return `${subject(times[0][0])} 가장 붐비고 ${subject(times[2][0])} 가장 한산합니다. ${week}.`;
+}
+function dongBlock(dong) {
+  const d = dong.dense;
+  const yoy = `${dong.yoy > 0 ? "+" : ""}${dong.yoy}%`;
+  return `<div class="block"><h3>${esc(dong.name)} 유동인구 밀도</h3>
+    <p class="summary">${denseSummary(d)}</p>
+    <div class="heat three">${heatCell("오전 6~11시", d.am)}${heatCell("오후 11~17시", d.pm)}${heatCell("저녁 17~21시", d.eve)}</div>
+    <div class="heat two">${heatCell("평일 하루 평균", d.wk)}${heatCell("주말 하루 평균", d.we)}</div>
+    <p class="sub" style="margin-top:8px">색이 진할수록 붐빕니다. 숫자는 서울 평균 행정동을 1로 본 배수이고, 시간대는 시간당 값으로 비교했습니다. 가게 앞이 아니라 동 전체 값입니다. 1년 전 같은 분기 대비 전체 유동인구 ${yoy}.</p>
+    <p class="sub" style="margin-top:12px">연령대별 비중 (막대: ${esc(dong.name)}, 검은 눈금: 서울 평균)</p>
+    ${compareBars(AGE_LABELS, dong.age, DATA.seoul.age)}
+  </div>`;
+}
+const MAP_SIZE = { w: 1040, h: 700 };
+const MAP_METERS = 1000, UNITS_PER_M = 0.755;
+const ZONE_COLORS = { 1: "#d1553a", 2: "#cf9418", 3: "#c4528f", 4: "#2e7db3", 5: "#6f5bbd" };
+const mapCache = new Map();
+function toMap(lat, lng) {
+  const c = DATA.tf;
+  return [c[0][0] * lat + c[1][0] * lng + c[2][0], c[0][1] * lat + c[1][1] * lng + c[2][1]];
+}
+function osmPath(list, cx, cy, reach) {
+  const path = new Path2D();
+  list.forEach(r => {
+    let y = r[0], x = r[1];
+    const pts = [toMap(y, x)];
+    for (let i = 2; i < r.length; i += 2) { y += r[i]; x += r[i + 1]; pts.push(toMap(y, x)); }
+    if (!pts.some(p => Math.abs(p[0] - cx) < reach && Math.abs(p[1] - cy) < reach)) return;
+    path.moveTo(pts[0][0], pts[0][1]);
+    pts.slice(1).forEach(p => path.lineTo(p[0], p[1]));
+  });
+  return path;
+}
+function renderMapImage(a) {
+  const { w, h } = MAP_SIZE;
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  const [cx, cy] = toMap(a[2], a[3]);
+  const scale = w / (MAP_METERS * UNITS_PER_M);
+  const px = (x, y) => [(x - cx) * scale + w / 2, (y - cy) * scale + h / 2];
+  ctx.fillStyle = "#f6f7f2"; ctx.fillRect(0, 0, w, h);
+  const cell = 14, cols = Math.ceil(w / cell) + 1, rows = Math.ceil(h / cell) + 1;
+  let grid = new Float32Array(cols * rows);
+  DATA.shops.forEach(shop => {
+    if (!DATA.catLife[shop[2]]) return;
+    const [x, y] = toMap(shop[0], shop[1]);
+    const [sx, sy] = px(x, y);
+    const c = Math.floor(sx / cell), r = Math.floor(sy / cell);
+    if (c >= 0 && r >= 0 && c < cols && r < rows) grid[r * cols + c] += 1;
+  });
+  for (let pass = 0; pass < 3; pass++) {
+    const next = new Float32Array(cols * rows);
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      let sum = 0, n = 0;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        const rr = r + dr, cc = c + dc;
+        if (rr >= 0 && cc >= 0 && rr < rows && cc < cols) { sum += grid[rr * cols + cc]; n += 1; }
+      }
+      next[r * cols + c] = sum / n;
+    }
+    grid = next;
+  }
+  const peak = 3.2;
+  const layer = document.createElement("canvas");
+  layer.width = cols; layer.height = rows;
+  const layerCtx = layer.getContext("2d");
+  const image = layerCtx.createImageData(cols, rows);
+  for (let i = 0; i < grid.length; i++) {
+    const v = Math.min(1, grid[i] / peak);
+    image.data[i * 4] = 62; image.data[i * 4 + 1] = 110; image.data[i * 4 + 2] = 84;
+    image.data[i * 4 + 3] = v < 0.04 ? 0 : Math.round(v * 185);
+  }
+  layerCtx.putImageData(image, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(layer, -cell / 2, -cell / 2, cols * cell, rows * cell);
+  ctx.save();
+  ctx.setTransform(scale, 0, 0, scale, w / 2 - cx * scale, h / 2 - cy * scale);
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.strokeStyle = "rgba(120,190,145,.55)"; ctx.lineWidth = 34;
+  DATA.base.park.forEach(d => ctx.stroke(new Path2D(d)));
+  const reach = MAP_METERS * UNITS_PER_M;
+  ctx.strokeStyle = "rgba(95,105,100,.3)"; ctx.lineWidth = 1;
+  ctx.stroke(osmPath(DATA.roads.svc, cx, cy, reach));
+  ctx.strokeStyle = "rgba(95,105,100,.45)"; ctx.lineWidth = 1.4;
+  ctx.stroke(osmPath(DATA.roads.min, cx, cy, reach));
+  ctx.strokeStyle = "rgba(70,80,75,.8)"; ctx.lineWidth = 3.2;
+  ctx.stroke(osmPath(DATA.roads.maj, cx, cy, reach));
+  ctx.lineWidth = 2.4;
+  Object.entries(DATA.base.zones).forEach(([zone, d]) => {
+    ctx.strokeStyle = ZONE_COLORS[zone];
+    ctx.stroke(new Path2D(d));
+  });
+  const hit = trdarFor(a);
+  const inView = t => { const [mx, my] = toMap(t[3], t[4]); return Math.abs(mx - cx) < reach && Math.abs(my - cy) < reach; };
+  (DATA.trdar || []).forEach((t, i) => {
+    if (!TRDAR_SHAPE[i].length || !inView(t) || (a[5] && !(hit && hit.i === i))) return;   // 연남동 권역 주소는 권역선이 있어 소속 상권만 그립니다
+    const path = new Path2D();
+    TRDAR_SHAPE[i].forEach(ring => ring.forEach(([y, x], j) => {
+      const [mx, my] = toMap(y, x);
+      if (j) path.lineTo(mx, my); else path.moveTo(mx, my);
+    }));
+    const mine = hit && hit.i === i;
+    if (mine && hit.inside) { ctx.fillStyle = "rgba(15,124,138,.17)"; ctx.fill(path, "evenodd"); }
+    ctx.strokeStyle = "#0f7c8a"; ctx.lineWidth = mine ? 3 : 1.6;
+    ctx.stroke(path);
+  });
+  ctx.restore();
+  const font = weight => `${weight} 19px "Noto Sans KR", "Malgun Gothic", sans-serif`;
+  const label = (text, x, y, color) => {
+    ctx.font = font(500); ctx.textAlign = "center"; ctx.lineJoin = "round";
+    ctx.lineWidth = 5; ctx.strokeStyle = "#ffffff"; ctx.strokeText(text, x, y);
+    ctx.fillStyle = color; ctx.fillText(text, x, y);
+  };
+  DATA.base.labels.forEach(([x, y, n]) => {
+    const [sx, sy] = px(x, y);
+    ctx.fillStyle = ZONE_COLORS[n];
+    ctx.beginPath(); ctx.arc(sx, sy, 16, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#ffffff"; ctx.font = font(700); ctx.textAlign = "center"; ctx.fillText(n, sx, sy + 7);
+  });
+  DATA.base.pois.forEach(([x, y, text]) => { const [sx, sy] = px(x, y); label(text, sx, sy, "#1f2a24"); });
+  (DATA.trdar || []).forEach((t, i) => {
+    if (!TRDAR_SHAPE[i].length || (a[5] && !(hit && hit.i === i))) return;
+    const [mx, my] = toMap(t[3], t[4]);
+    const [sx, sy] = px(mx, my);
+    if (sx < 40 || sy < 20 || sx > w - 40 || sy > h - 20) return;
+    const nearPin = Math.hypot(sx - w / 2, sy - (h / 2 - 40)) < 90;
+    const mine = hit && hit.i === i && hit.inside;
+    if (nearPin && !mine) return;   // 핀과 겹치는 다른 상권 이름은 빼고, 이 주소의 상권 이름은 핀 아래에 씁니다
+    label(t[1], nearPin ? w / 2 : sx, nearPin ? h / 2 + 28 : sy, "#0b5d68");
+  });
+  DATA.stations.forEach(([name, y, x]) => {
+    const [mx, my] = toMap(y, x);
+    const [sx, sy] = px(mx, my);
+    if (sx < 0 || sy < 0 || sx > w || sy > h) return;
+    ctx.fillStyle = "#2460c4"; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(sx, sy, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    label(`${name}역`, sx, sy - 18, "#17438f");
+  });
+  const radius = RADIUS * UNITS_PER_M * scale;
+  ctx.strokeStyle = "#1f2a24"; ctx.lineWidth = 2.5; ctx.setLineDash([10, 8]);
+  ctx.beginPath(); ctx.arc(w / 2, h / 2, radius, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = "#c8341f"; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(w / 2, h / 2);
+  ctx.bezierCurveTo(w / 2 - 22, h / 2 - 26, w / 2 - 20, h / 2 - 50, w / 2, h / 2 - 50);
+  ctx.bezierCurveTo(w / 2 + 20, h / 2 - 50, w / 2 + 22, h / 2 - 26, w / 2, h / 2);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(w / 2, h / 2 - 32, 7, 0, Math.PI * 2); ctx.fill();
+  label(a[0], w / 2, h / 2 - 60, "#8e1f10");
+  const bar = 200 * UNITS_PER_M * scale;
+  ctx.fillStyle = "#1f2a24"; ctx.fillRect(24, h - 28, bar, 4);
+  label("200m", 24 + bar / 2, h - 38, "#1f2a24");
+  return canvas;
+}
+const ZONE_MAP_SIZE = 860;
+const ZONE_SHORT = { 1: "관문·숲길", 2: "동진시장·끼리끼리길", 3: "세모길·카페거리", 4: "커뮤니티센터·벚꽃길", 5: "서측 연남로" };
+function renderZoneImage(a, zoneKey) {
+  const size = ZONE_MAP_SIZE;
+  const canvas = document.createElement("canvas");
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  const scale = size / 940, offset = (size - 900 * scale) / 2;
+  const px = (x, y) => [x * scale + offset, y * scale];
+  const chosen = zoneKey.replace("zone", "");
+  ctx.fillStyle = "#f6f7f2"; ctx.fillRect(0, 0, size, size);
+  ctx.save();
+  ctx.setTransform(scale, 0, 0, scale, offset, 0);
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  Object.entries(DATA.base.zones).forEach(([zone, d]) => {
+    const path = new Path2D(d);
+    ctx.globalAlpha = zone === chosen ? 0.42 : 0.16;
+    ctx.fillStyle = ZONE_COLORS[zone]; ctx.fill(path);
+    ctx.globalAlpha = 1;
+  });
+  ctx.strokeStyle = "rgba(120,190,145,.7)"; ctx.lineWidth = 34;
+  DATA.base.park.forEach(d => ctx.stroke(new Path2D(d)));
+  ctx.strokeStyle = "rgba(95,105,100,.4)"; ctx.lineWidth = 1.4;
+  DATA.base.rmin.forEach(d => ctx.stroke(new Path2D(d)));
+  ctx.strokeStyle = "rgba(70,80,75,.75)"; ctx.lineWidth = 3.2;
+  DATA.base.rmaj.forEach(d => ctx.stroke(new Path2D(d)));
+  Object.entries(DATA.base.zones).forEach(([zone, d]) => {
+    ctx.strokeStyle = ZONE_COLORS[zone]; ctx.lineWidth = zone === chosen ? 5 : 2.2;
+    ctx.stroke(new Path2D(d));
+  });
+  ctx.restore();
+  const font = weight => `${weight} 22px "Noto Sans KR", "Malgun Gothic", sans-serif`;
+  ctx.textAlign = "center";
+  DATA.base.labels.forEach(([x, y, n]) => {
+    const [sx, sy] = px(x, y);
+    ctx.fillStyle = ZONE_COLORS[n];
+    ctx.beginPath(); ctx.arc(sx, sy, 20, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#ffffff"; ctx.font = font(700); ctx.fillText(n, sx, sy + 8);
+    ctx.font = font(n === chosen ? 700 : 500); ctx.lineJoin = "round"; ctx.lineWidth = 5; ctx.strokeStyle = "#ffffff";
+    const labelY = n === "4" ? sy - 30 : sy + 46;
+    ctx.strokeText(ZONE_SHORT[n], sx, labelY);
+    ctx.fillStyle = "#1f2a24"; ctx.fillText(ZONE_SHORT[n], sx, labelY);
+  });
+  const [mx, my] = toMap(a[2], a[3]);
+  const [sx, sy] = px(mx, my);
+  ctx.fillStyle = "#c8341f"; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(sx, sy);
+  ctx.bezierCurveTo(sx - 22, sy - 26, sx - 20, sy - 50, sx, sy - 50);
+  ctx.bezierCurveTo(sx + 20, sy - 50, sx + 22, sy - 26, sx, sy);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(sx, sy - 32, 7, 0, Math.PI * 2); ctx.fill();
+  return canvas;
+}
+function zoneMapBlock() {
+  if (!place || !inYeonnam()) return "";
+  return `<div class="block map-wrap"><h3>연남동 권역 지도</h3>
+    <canvas id="zoneMap" width="${ZONE_MAP_SIZE}" height="${ZONE_MAP_SIZE}" role="img" aria-label="연남동 5개 권역 지도와 입력한 주소 위치"></canvas>
+    <p class="sub">진한 색이 선택한 권역이고, 빨간 핀이 입력한 주소입니다.</p>
+  </div>`;
+}
+function paintZoneMap() {
+  const canvas = document.getElementById("zoneMap");
+  if (!canvas || !place) return;
+  const key = `${place[0]}|${state.zone}`;
+  if (!mapCache.has(key)) mapCache.set(key, renderZoneImage(place, state.zone));
+  canvas.getContext("2d").drawImage(mapCache.get(key), 0, 0);
+}
+function mapBlock() {
+  if (!place) return "";
+  const query = encodeURIComponent(`서울 마포구 ${place[1] || place[0]}`);
+  return `<div class="block map-wrap"><h3>위치 지도</h3>
+    <canvas id="placeMap" width="${MAP_SIZE.w}" height="${MAP_SIZE.h}" role="img" aria-label="${esc(place[0])} 위치와 주변 상가 밀도 지도"></canvas>
+    <p class="sub">빨간 핀: 입력한 주소. 파란 점: 지하철역. 점선: 반경 300m. 청록 선: 서울시 공식 상권 경계${trdarFor(place)?.inside ? `(색칠한 곳이 이 주소의 상권 ${esc(trdarFor(place).t[1])})` : ""}. 초록이 진할수록 음식·소매·생활서비스 점포가 많은 곳입니다.${inYeonnam() ? " 숫자는 연남동 권역입니다." : ""} 지도는 ${MAP_METERS.toLocaleString()}m 폭의 약도이며, 유동인구가 아니라 상가 밀도입니다. 도로·역 © OpenStreetMap contributors.</p>
+    <a class="map-link" data-html2canvas-ignore href="https://map.naver.com/p/search/${query}" target="_blank" rel="noopener">네이버 지도에서 크게 보기</a>
+  </div>`;
+}
+function paintMap() {
+  const canvas = document.getElementById("placeMap");
+  if (!canvas || !place) return;
+  if (!mapCache.has(place[0])) mapCache.set(place[0], renderMapImage(place));
+  canvas.getContext("2d").drawImage(mapCache.get(place[0]), 0, 0);
+}
+function placeBlock(biz, around, area) {
+  if (!around) return `<div class="block"><h3>주변 상가 자료</h3><p class="summary">주소를 찾지 못해 자동 집계를 하지 못했습니다. 주변 동일업종은 직접 고른 값으로 계산했습니다.</p></div>`;
+  const max = around.top.length ? around.top[0][1] : 1;
+  return `<div class="block"><h3>주변 상가 자료</h3>
+    <div class="facts">
+      <div class="fact"><span>반경 300m ${biz.label}</span><b>${around.count.toLocaleString()}곳</b></div>
+      <div class="fact"><span>주요상권</span><b>${esc(area)}</b></div>
+    </div>
+    <p class="sub">반경 300m 음식·소매·생활서비스 ${around.total.toLocaleString()}곳 중 많은 업종</p>
+    <ul class="bars" aria-label="반경 300m 많은 업종">${around.top.map(t => `<li><span>${esc(t[0])}</span><i><b style="width:${t[1] / max * 100}%"></b></i><span>${t[1]}곳</span></li>`).join("")}</ul>
+  </div>
+  <div class="block"><h3>가까운 ${biz.label}</h3>
+    ${around.near.length ? `<ul class="near">${around.near.map(n => `<li><span>${esc(n.name)}</span><span>${Math.round(n.d)}m · ${esc(floorLabel(n.floor))}</span></li>`).join("")}</ul>` : `<p class="summary">반경 300m 안에 같은 업종 점포가 없습니다.</p>`}
+  </div>`;
+}
+function syncAuto() {
+  const form = document.getElementById("form");
+  AUTO_KEYS.forEach(key => { form.elements[key].value = state[key]; });
+}
+function render() {
+  const biz = bizInfo(state);
+  const custom = state.biz === "custom";
+  if (!depositManual) {
+    state.deposit = state.rent * DEPOSIT_MONTHS;
+    document.getElementById("deposit").value = state.deposit || "";
+  }
+  document.getElementById("customBox").hidden = !custom;
+  const around = place ? surroundings(place, state) : null;
+  const dong = place ? DATA.dongs[place[4]] : null;
+  if (around && !around.noMatch && !manual.has("compete")) state.compete = around.level;
+  if (dong) applyDong(dong);
+  const station = place ? stationInfo(place) : null;
+  if (station && !manual.has("station")) state.station = station.level;
+  applyZone();
+  syncAuto();
+  const area = place ? majorArea(place) : "";
+  const trend = place && state.biz !== "custom" ? trendInfo(state.biz) : null;
+  const r = calculate(state), v = verdict(r);
+  const scores = [["입지(위치)", r.location, 20], ["동일업종", r.compete, 10], ["유동인구", r.flow, 30], ["주 고객층", r.customer, 20], ["가격", r.price.pts, 20]];
+  const compared = r.priceKnown ? scores : scores.slice(0, 4);
+  const sorted = [...compared].sort((a, b) => b[1] / b[2] - a[1] / a[2]);
+  const ratio = s => s[1] / s[2];
+  const best = ratio(sorted[0]), worst = ratio(sorted[sorted.length - 1]);
+  const strongList = sorted.filter(s => ratio(s) === best).map(s => s[0]);
+  const weakList = sorted.filter(s => ratio(s) === worst).map(s => s[0]);
+  const summaryText = best === worst
+    ? "모든 항목의 비율이 같습니다. 계약 전 확인 항목을 먼저 짚어 보세요."
+    : `${best === 1 ? "만점 항목은" : "가장 좋은 항목은"} ${strongList.join(", ")}이고, 가장 약한 항목은 ${weakList.join(", ")}입니다. 상담에서는 ${weakList[0]} 조건을 먼저 짚어 보는 것이 좋습니다.`;
+  const gapText = r.price.gap === null
+    ? (r.price.unit ? `평당 월세 ${r.price.unit.toFixed(1)}만원. ${inYeonnam() ? "권역을 고르면 적정 월세 범위를 계산합니다." : "주변 평균을 넣지 않아 가격은 비교 불가입니다."}` : "희망 월세와 전용면적을 넣으면 평당 월세를 계산합니다. 가격은 비교 불가입니다.") :
+    r.price.range ? `적정 월세 ${won(r.price.range.low)}~${won(r.price.range.high)}. 입력 월세 ${won(state.rent)}은 ${r.price.range.position}.${r.price.range.below ? " 낮은 이유를 확인하기 전까지 4점을 뺐습니다." : ""}` :
+    `평당 월세 ${r.price.unit.toFixed(1)}만원. 주변 평균 ${state.marketRent}만원보다 ${Math.abs(Math.round(r.price.gap * 100))}% ${r.price.gap >= 0 ? "높습니다" : "낮습니다"}.`;
+  document.getElementById("zoneBox").hidden = !inYeonnam();
+  document.getElementById("marketBox").hidden = inYeonnam();
+  document.getElementById("depositHelp").textContent = depositManual
+    ? `직접 고친 금액입니다. 칸을 비우면 월세의 ${DEPOSIT_MONTHS}배로 다시 자동 입력됩니다.`
+    : `월세의 ${DEPOSIT_MONTHS}배로 자동 입력됩니다. 다르면 직접 고치세요.`;
+  document.getElementById("areaHelp").textContent = state.area > 0
+    ? `약 ${r.price.pyeong.toFixed(1)}평${r.price.unit ? `, 평당 월세 ${r.price.unit.toFixed(1)}만원` : ""}`
+    : "전용면적을 넣으면 평수와 평당 월세를 계산합니다.";
+  document.getElementById("stationHelp").textContent = station
+    ? `${station.name}역까지 길을 따라 ${station.walk.toLocaleString()}m, 도보 약 ${station.min}분입니다. ${manual.has("station") ? "직접 고른 값입니다." : "자동으로 골랐습니다. 다르면 직접 고르세요."}`
+    : "주소를 고르면 가까운 역까지 도보 거리를 자동으로 계산합니다.";
+  const stationWhy = station ? `${station.name}역까지 도보 약 ${station.min}분(${station.walk.toLocaleString()}m). ` : "";
+  const countText = around && !around.noMatch ? `반경 300m ${around.count}곳, ` : "";
+  const manualText = around && (around.noMatch || manual.has("compete")) ? " 직접 고른 값입니다." : "";
+  const flowWhy = FLOW.map(i => `${i.q.split(" ")[0]} ${FLOW_OPTS.find(o => o[0] === state[i.key])[1]}`).join(", ") + ".";
+  const customerWhy = dong
+    ? `20·30대 비중 ${dong.young}%. ${CUSTOMERS[state.customer]} 기준으로 계산했습니다.`
+    : `${CUSTOMERS[state.customer]} 중심 상권입니다.`;
+  const competeWhy = biz.type === "cluster"
+    ? `${topic(biz.label)} 모일수록 유리한 업종입니다. ${countText}${COMPETE_LABEL[state.compete]}.${state.compete === "dense" ? " 다만 많음 기준의 2배를 넘어 경쟁 부담을 반영했습니다." : ""}${manualText}`
+    : `${topic(biz.label)} 많으면 불리한 업종입니다. ${countText}${COMPETE_LABEL[state.compete]}.${manualText}`;
+  const th = thresholds(state);
+  const rule = th ? `마포구 주소 기준 ${th.low}곳 이하는 적음, ${th.high}곳 이상은 많음, ${th.high * DENSE_RATIO}곳 이상은 과밀로 자동 선택합니다.` : "자료에서 찾지 못한 업종은 직접 고르세요.";
+  const bizState = document.getElementById("bizState");
+  bizState.className = !custom || th ? "addr-state" : "addr-state miss";
+  const catCount = customCats(state.customBiz).size;
+  bizState.textContent = !state.customBiz.trim() ? "업종을 입력하세요." : !th ? "마포구 상가 자료에서 찾지 못했습니다. 주변 동일업종을 직접 고르세요." :
+    catCount ? `상가 자료의 업종 분류 ${catCount}개로 집계합니다.` : "상호에 이 단어가 들어간 점포로 집계합니다.";
+  document.getElementById("competeHelp").textContent = (biz.type === "cluster"
+    ? `${topic(biz.label)} 거리 자체가 손님을 끌어 많을수록 점수가 높습니다. `
+    : `${topic(biz.label)} 동네 손님을 나눠 가져 적을수록 점수가 높습니다. `) + rule;
+  const addrState = document.getElementById("addrState");
+  addrState.className = place ? "addr-state" : "addr-state miss";
+  addrState.textContent = place ? `찾았습니다. 도로명: ${place[1]}` : "목록에서 주소를 고르세요. 상가 자료에 있는 마포구 주소만 찾을 수 있습니다.";
+  const flags = RISKS.map(item => {
+    const status = RISK_OPTS.find(o => o[0] === state[item.key]);
+    return `<li class="flag ${status[0]}"><span>${item.label}</span><b>${status[1]}</b></li>`;
+  }).join("");
+  currentFacts = JSON.stringify({
+    주소: state.address, 희망업종: biz.label, 총점: r.total, 판정: v[0], 희망월세: `${state.rent}만원`, 전용면적: `${state.area}㎡`,
+    층수: FLOORS.find(f => f[0] === state.storeFloor)[1],
+    가까운역: station ? `${station.name}역, 길을 따라 ${station.walk}m, 도보 약 ${station.min}분` : "자동 계산 없음",
+    항목별점수: Object.fromEntries(compared.map(s => [s[0], `${s[1]}/${s[2]}`])),
+    점수방식: r.priceKnown ? "100점 만점" : "가격 비교 불가, 나머지 80점을 100점으로 환산",
+    월세: gapText, 주변상가: around ? { 반경: "300m", 같은업종수: around.count, 수준: COMPETE_LABEL[state.compete], 주요상권: area, 많은업종: around.top.map(t => `${t[0]} ${t[1]}곳`) } : "자동 집계 없음",
+    유동인구: dong ? { 단위: "행정동 전체", 동: dong.name, 비교기준: "서울 평균 동을 1로 본 배수", 오전: dong.dense.am, 오후: dong.dense.pm, 저녁: dong.dense.eve, 평일: dong.dense.wk, 주말: dong.dense.we, 전년동기대비: `${dong.yoy}%`, 이십삼십대비중: `${dong.young}%` } : "자동 집계 없음",
+    상권5년흐름: trend && trend.recent ? { 주의: trend.recent.now < 10 ? "점포 수가 적어 비율이 크게 흔들릴 수 있음" : "없음", 출처: "서울시 상권분석서비스(추정치)", 상권: trend.inside ? trend.name : `${trend.name}(경계 밖 ${Math.round(trend.d)}m, 가장 가까운 상권)`, 상권안같은업종: `${trend.recent.now}곳`, 점포당월평균추정매출: trend.recent.per ? won(trend.recent.per) : "자료 없음", 마포구평균월매출: trend.mapo.per ? won(trend.mapo.per) : "자료 없음", 연폐업률: trend.recent.closeRate?.toFixed(1) + "%", 마포구평균폐업률: trend.mapo.closeRate?.toFixed(1) + "%", 연도별점포수: trend.years.map(y => `${y.y}년 ${y.n}곳(개업 ${y.open}, 폐업 ${y.close})`) } : "자료 없음",
+    주고객층: CUSTOMERS[state.customer],
+    공공참고임대료: rebRent() ? `${rebRent().name} 상권 평당 ${rebRent().pyeong.toFixed(1)}만원(1층, 전용+공용 면적, 보증금 환산 포함, 전용 평당과 직접 비교 불가)` : "없음",
+    "계약 전 확인": Object.fromEntries(RISKS.map(item => [item.label, RISK_OPTS.find(o => o[0] === state[item.key])[1]]))
+  });
+  if (aiBusy && aiFacts !== currentFacts) aiControl?.abort();
+  if (!aiBusy) document.getElementById("aiBtn").textContent = aiFacts === currentFacts && aiText ? "AI 문장 다시 만들기" : "AI 상담 문장 만들기";
+  document.getElementById("reportBody").innerHTML = `
+    <div class="report-head"><span class="kind">입지 리포트 · ${biz.label} 창업 검토</span><h2>${esc(state.address || "주소를 입력하세요")}</h2>${inYeonnam() && state.zone ? `<span class="kind">${esc(RENT_ZONES.find(z => z[0] === state.zone)[1])}</span>` : ""}<span class="kind">작성일 ${new Date().toLocaleDateString("ko-KR")}</span></div>
+    <div class="result"><div class="score">${r.total}<small> /100</small></div><div class="verdict"><b>${v[0]}</b><span>${v[1]}</span></div></div>
+    <div class="scale" role="img" aria-label="항목별 득점 막대. 총 ${r.total}점">${scores.map(s => seg(...s)).join("")}</div>
+    <div class="rows">
+      ${row("위치", r.location, 20, `${FLOORS.find(f => f[0] === state.storeFloor)[1]}, 밖에서 ${VISIBILITY.find(o => o[0] === state.visibility)[1]}. ${state.storeFloor === "upper" && upperFriendly(state) ? "윗층이 괜찮은 업종이라 층수 점수를 3점으로 봅니다. " : ""}${stationWhy}역 거리, 접한 길, 층과 가시성, 찾아오기를 5점씩 봅니다.`)}
+      ${row("주변 동일업종", r.compete, 10, competeWhy)}
+      ${row("유동인구", r.flow, 30, flowWhy)}
+      ${row("주 고객층", r.customer, 20, customerWhy)}
+      ${r.priceKnown ? row("가격 수준", r.price.pts, 20, gapText) : `<div class="row"><b>가격 수준</b><span class="pts"><small>비교 불가</small></span><p>${gapText}</p></div>`}
+    </div>
+    <div class="block"><h3>상담 요약</h3><p class="summary">${summaryText}</p></div>
+    ${zoneMapBlock()}
+    ${mapBlock()}
+    ${priceBlock(r.price.range)}
+    ${rebBlock()}
+    ${placeBlock(biz, around, area)}
+    ${trendBlock(biz, trend)}
+    ${dong ? dongBlock(dong) : ""}
+    ${aiBlock()}
+    <div class="block"><h3>계약 전 확인</h3><ul>${flags}</ul></div>
+    <div class="block"><h3>현장에서 볼 것</h3><ul class="checks">${FIELD_CHECKS[biz.type].map(t => `<li>${t}</li>`).join("")}</ul></div>
+    <div class="foot"><p>메디넷부동산공인중개사사무소 · 대표 정영숙 · 02-3141-8837</p><p>이 점수는 상담 참고용이며 계약 판단을 대신하지 않습니다.</p><p>자료: 소상공인시장진흥공단 상가(상권)정보 ${SRC.shops}, 주요상권 ${SRC.areas} 기준, 서울시 상권분석서비스 길단위인구 ${DATA.pop.q}·점포·추정매출 ${SRC.trdar}, 한국부동산원 상업용부동산 임대동향조사 ${SRC.reb}, 역·도로 OpenStreetMap contributors(ODbL). 유동인구는 가게 앞이 아니라 행정동 전체 값입니다.</p></div>`;
+  document.getElementById("mini").innerHTML = `<span>${r.total}점 · ${v[0]}</span><span>리포트 보기</span>`;
+  paintMap();
+  paintZoneMap();
+}
+function start() {
+  buildForm();
+  fillForm();
+  const form = document.getElementById("form");
+  form.addEventListener("submit", e => e.preventDefault());
+  form.addEventListener("change", e => {
+    if (e.target.name === "deposit" && e.target.value === "") {
+      depositManual = false;
+      render();
+    }
+  });
+  form.addEventListener("input", e => {
+    const t = e.target;
+    if (!t.name) return;
+    state[t.name] = t.type === "number" ? Number(t.value) : t.value;
+    if (t.name === "address") {
+      place = findAddress(t.value);
+      manual.clear();
+      showSuggestions(place ? [] : suggestAddresses(t.value));
+    }
+    if (t.name === "customBiz") {
+      showBizSuggestions(t.value);
+      setCustomType();
+    }
+    if (t.name === "biz" || t.name === "customBiz") manual.delete("compete");
+    if (t.name === "deposit") depositManual = true;
+    if (t.name === "zone") manual.add("zone");
+    if (AUTO_KEYS.includes(t.name)) manual.add(t.name);
+    render();
+  });
+  document.getElementById("suggest").addEventListener("click", e => {
+    const pick = e.target.closest("button");
+    if (!pick) return;
+    choosePlace(DATA.addr[Number(pick.dataset.index)]);
+  });
+  document.getElementById("bizSuggest").addEventListener("click", e => {
+    const pick = e.target.closest("button");
+    if (!pick) return;
+    state.customBiz = pick.dataset.name;
+    document.getElementById("customBiz").value = pick.dataset.name;
+    showBizSuggestions("");
+    setCustomType();
+    manual.delete("compete");
+    render();
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    showBizSuggestions("");
+    depositManual = false;
+    state = { ...SAMPLE };
+    place = findAddress(state.address);
+    manual.clear();
+    showSuggestions([]);
+    fillForm();
+    render();
+  });
+  place = findAddress(state.address);
+  render();
+  startActions();
+}
+function showBizSuggestions(text) {
+  const box = document.getElementById("bizSuggest");
+  const key = squeeze(text);
+  const exact = DATA.cats.some(c => squeeze(c) === key);
+  const list = key && !exact ? [...customCats(text)].slice(0, 6).map(i => DATA.cats[i]) : [];
+  box.hidden = !list.length;
+  box.innerHTML = list.map(c => `<li><button type="button" data-name="${esc(c)}">${esc(c)}</button></li>`).join("");
+}
+function setCustomType() {
+  const first = [...customCats(state.customBiz)][0];
+  if (first === undefined) return;
+  state.customType = DATA.catTop[first] === "음식" ? "cluster" : "local";
+  document.getElementById("form").elements.customType.value = state.customType;
+}
+function choosePlace(a) {
+  place = a;
+  state.address = a[0];
+  manual.clear();
+  document.getElementById("address").value = a[0];
+  showSuggestions([]);
+  render();
+}
+function showSuggestions(list) {
+  const box = document.getElementById("suggest");
+  box.hidden = !list.length;
+  box.innerHTML = list.map(a => `<li><button type="button" data-index="${DATA.addr.indexOf(a)}">${esc(a[0])}<small>${esc(a[1])}</small></button></li>`).join("");
+}
+start();
+</script>

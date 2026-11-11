@@ -2,171 +2,364 @@
 <html lang="ko">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>공개용 상가 입지 리포트</title>
+<title>메디넷 상가 입지 리포트</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-/* Layout: 왼쪽은 현장 입력지, 오른쪽은 그 자리에서 채워지는 입지 확인서 */
+/* v3 레이아웃: 가운데 정렬 제목 → 왼쪽 접이식 조건 패널 + 오른쪽 지표 카드·탭 분석 (메디넷 상가 입지 리포트) */
 :root {
-  --bg: #eef1ea; --surface: #fbfcf9; --ink: #1f2a24; --muted: #5a675f; --line: #cfd8cd;
-  --sage: #5f7d6b; --sage-deep: #3e5a4b; --sage-soft: #dfe7dd; --on-sage: #ffffff;
-  --track: #dde3da; --warn: #8f5a0c; --warn-soft: #f5ead6; --bad: #9c3a2f; --bad-soft: #f6e2de;
-  --good: #356a4c; --good-soft: #dcebdf;
-  --d1: #e3ebe2; --d2: #c5d6c8; --d3: #9dbba7; --d4: #5f8570; --d5: #3e5a4b; --d-ink: #1f2a24; --d-ink-strong: #ffffff;
-  --display: "Gowun Batang", "Noto Serif KR", serif;
-  --body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --bg: #f3f5f8; --surface: #ffffff; --ink: #141c2b; --muted: #5d6779; --line: #e1e6ee;
+  --sage: #3d6fa8; --sage-deep: #1d3f6e; --sage-soft: #e8eff8; --on-sage: #ffffff;
+  --accent: #0f8a8a;
+  --track: #e6eaf0; --warn: #9a5b06; --warn-soft: #fbf0dc; --bad: #b3372b; --bad-soft: #fbe5e2;
+  --good: #1f7a55; --good-soft: #e2f3eb;
+  --d1: #eaf0f8; --d2: #c9d8ec; --d3: #93b2d8; --d4: #4f7fb8; --d5: #1d3f6e; --d-ink: #141c2b; --d-ink-strong: #ffffff;
+  --shadow: 0 1px 2px rgba(20, 28, 43, .05), 0 4px 16px rgba(20, 28, 43, .05);
+  --btn-bg: #ffffff; --btn-ink: #141c2b; --btn-line: #d5dbe5; --pick-bg: #5b21b6; --pick-ink: #fde047;
+  --display: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --body: var(--display);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #161b18; --surface: #1f2622; --ink: #e8eee9; --muted: #a5b2a9; --line: #38443d;
-    --sage: #8fae9b; --sage-deep: #b5cdbd; --sage-soft: #2d3a33; --on-sage: #14201a;
-    --track: #33403a; --warn: #e6b566; --warn-soft: #3b3020; --bad: #ee9a8e; --bad-soft: #43291f;
-    --good: #93cfa9; --good-soft: #233a2c;
-    --d1: #27332c; --d2: #34483d; --d3: #4a6a58; --d4: #6b9079; --d5: #a6c6b1; --d-ink: #e8eee9; --d-ink-strong: #14201a; color-scheme: dark;
+    --bg: #0f141c; --surface: #171e29; --ink: #e8edf5; --muted: #9aa6b8; --line: #2a3443;
+    --sage: #7aa5dc; --sage-deep: #a9c6ee; --sage-soft: #1e2b3d; --on-sage: #0f141c; --accent: #4fc2c2;
+    --track: #2a3443; --warn: #e9b765; --warn-soft: #3a2f1c; --bad: #f19a8e; --bad-soft: #43251f;
+    --good: #7fd3ac; --good-soft: #1b3529;
+    --d1: #1e2b3d; --d2: #27405f; --d3: #3d6194; --d4: #6a93cc; --d5: #a9c6ee; --d-ink: #e8edf5; --d-ink-strong: #0f141c;
+    --shadow: none; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #161b18; --surface: #1f2622; --ink: #e8eee9; --muted: #a5b2a9; --line: #38443d;
-  --sage: #8fae9b; --sage-deep: #b5cdbd; --sage-soft: #2d3a33; --on-sage: #14201a;
-  --track: #33403a; --warn: #e6b566; --warn-soft: #3b3020; --bad: #ee9a8e; --bad-soft: #43291f;
-  --good: #93cfa9; --good-soft: #233a2c;
-    --d1: #27332c; --d2: #34483d; --d3: #4a6a58; --d4: #6b9079; --d5: #a6c6b1; --d-ink: #e8eee9; --d-ink-strong: #14201a; color-scheme: dark;
+  --bg: #0f141c; --surface: #171e29; --ink: #e8edf5; --muted: #9aa6b8; --line: #2a3443;
+  --sage: #7aa5dc; --sage-deep: #a9c6ee; --sage-soft: #1e2b3d; --on-sage: #0f141c; --accent: #4fc2c2;
+  --track: #2a3443; --warn: #e9b765; --warn-soft: #3a2f1c; --bad: #f19a8e; --bad-soft: #43251f;
+  --good: #7fd3ac; --good-soft: #1b3529;
+  --d1: #1e2b3d; --d2: #27405f; --d3: #3d6194; --d4: #6a93cc; --d5: #a9c6ee; --d-ink: #e8edf5; --d-ink-strong: #0f141c;
+  --shadow: none; color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
-.page { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 96px; display: grid; gap: 24px; }
-header h1 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.25; margin: 0 0 6px; text-wrap: balance; }
-header p { margin: 0; color: var(--muted); max-width: 44em; }
-.sample-note { display: inline-block; margin-top: 12px; padding: 4px 12px; border-radius: 4px; background: var(--warn-soft); color: var(--warn); font-weight: 500; font-size: .92rem; }
-.work { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; }
-.form { display: grid; gap: 28px; min-width: 0; }
-fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 14px; min-width: 0; }
-legend { font-family: var(--display); font-size: 1.25rem; font-weight: 700; padding: 0 0 8px; width: 100%; border-bottom: 1px solid var(--line); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-legend small { font-family: var(--body); font-size: .9rem; font-weight: 400; color: var(--muted); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; letter-spacing: -0.01em; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; }
+.page { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 96px; display: grid; gap: 20px; }
+
+/* 제목: 가운데 정렬 */
+header { text-align: center; padding: 32px 0 4px; display: grid; justify-items: center; gap: 8px; }
+.title-line { display: inline-flex; align-items: center; gap: .36em; }
+.title-line .mark { width: 1.6em; height: 1.6em; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; line-height: 1; background: var(--sage-deep); color: var(--on-sage); font-size: .66em; font-weight: 800; letter-spacing: 0; flex: none; }
+header h1 { font-family: var(--display); font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 800; line-height: 1.25; letter-spacing: -0.03em; margin: 6px 0 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: none; text-align: center; }
+@media (min-width: 861px) { header p { white-space: nowrap; } }
+.sample-note { display: inline-block; margin-top: 4px; padding: 5px 14px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); font-weight: 600; font-size: .86rem; }
+
+/* 본문 2단: 조건 패널 + 분석 */
+.work { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 20px; align-items: start; }
+.side { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.side-head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--surface); border-bottom: 1px solid var(--line); font-weight: 700; }
+.side-head small { color: var(--muted); font-weight: 400; font-size: .82rem; }
+.form { display: grid; gap: 0; min-width: 0; padding: 4px 18px 18px; }
+fieldset { border: 0; margin: 0; padding: 14px 0; display: grid; gap: 12px; min-width: 0; border-bottom: 1px solid var(--line); }
+fieldset:last-of-type { border-bottom: 0; }
+legend { float: left; width: 100%; padding: 0; margin: 0; font-size: .98rem; font-weight: 700; display: flex; justify-content: space-between; gap: 12px; align-items: center; cursor: pointer; user-select: none; }
+legend::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); margin: 0 4px 4px 0; transition: transform .15s; flex: none; }
+legend small { font-size: .8rem; font-weight: 500; color: var(--muted); margin-left: auto; margin-right: 6px; }
+legend:not(:has(small))::after { margin-left: auto; }
+fieldset.closed > :not(legend) { display: none !important; }
+fieldset.closed legend::after { transform: rotate(-45deg); margin-bottom: 0; }
 .field { display: grid; gap: 6px; min-width: 0; }
-.field > label, .q { font-weight: 500; }
-input[type="text"], input[type="number"] { width: 100%; min-height: 46px; padding: 8px 12px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field > label, .q { font-weight: 600; font-size: .9rem; }
+textarea { width: 100%; padding: 8px 12px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; resize: vertical; }
+input[type="text"], input[type="number"] { width: 100%; min-height: 42px; padding: 8px 12px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus { border-color: var(--sage); outline: 0; box-shadow: 0 0 0 3px var(--sage-soft); }
+.file-btn { display: inline-flex; align-items: center; min-height: 38px; padding: 6px 14px; font-weight: 400; font-size: .9rem; color: var(--btn-ink); border: 1px solid var(--btn-line); border-radius: 8px; cursor: pointer; position: relative; background: var(--btn-bg); }
+.file-btn:hover { border-color: var(--pick-bg); }
+.file-btn:active { background: var(--pick-bg); border-color: var(--pick-bg); color: var(--pick-ink); font-weight: 700; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { position: relative; }
 .chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.chip span { display: flex; align-items: center; min-height: 42px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-.chip input:checked + span { background: var(--sage-deep); border-color: var(--sage-deep); color: var(--bg); font-weight: 500; }
+.chip span { display: flex; align-items: center; min-height: 36px; padding: 5px 12px; border: 1px solid var(--btn-line); border-radius: 8px; background: var(--btn-bg); color: var(--btn-ink); font-size: .9rem; font-weight: 400; transition: background .12s, color .12s, border-color .12s; }
+.chip:hover span { border-color: var(--pick-bg); }
+.chip input:checked + span { background: var(--pick-bg); border-color: var(--pick-bg); color: var(--pick-ink); font-weight: 700; }
 .chip input:focus-visible + span, button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--sage); outline-offset: 2px; }
-.help { color: var(--muted); font-size: .92rem; margin: 0; }
-button { min-height: 44px; padding: 8px 16px; font: inherit; font-weight: 500; color: var(--sage-deep); background: transparent; border: 1px solid var(--sage); border-radius: 6px; cursor: pointer; justify-self: start; }
-.report { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: clamp(18px, 3vw, 30px); display: grid; gap: 22px; scroll-margin-top: 12px; }
-.report-head { display: grid; gap: 2px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
-.report-head .kind { font-size: .92rem; color: var(--muted); }
-.report-head h2 { font-family: var(--display); font-size: 1.5rem; line-height: 1.35; margin: 0; }
-.result { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; }
-.score { font-family: var(--display); font-size: 4.2rem; line-height: 1; font-weight: 700; color: var(--sage-deep); font-variant-numeric: tabular-nums; }
-.score small { font-size: 1.2rem; color: var(--muted); font-weight: 400; }
-.verdict { flex: 1 1 200px; min-width: 0; }
-.verdict b { display: block; font-size: 1.2rem; }
-.verdict span { color: var(--muted); }
-.scale { display: grid; grid-template-columns: 20fr 10fr 30fr 20fr 20fr; gap: 3px; }
+.help { color: var(--muted); font-size: .84rem; margin: 0; line-height: 1.5; }
+button { min-height: 38px; padding: 6px 14px; font: inherit; font-size: .9rem; font-weight: 400; color: var(--btn-ink); background: var(--btn-bg); border: 1px solid var(--btn-line); border-radius: 8px; cursor: pointer; justify-self: start; transition: background .12s, color .12s, border-color .12s; }
+button:hover { border-color: var(--pick-bg); }
+button:active, button[aria-pressed="true"] { background: var(--pick-bg); border-color: var(--pick-bg); color: var(--pick-ink); font-weight: 700; }
+.suggest { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+[hidden] { display: none !important; }
+.suggest li + li { border-top: 1px solid var(--line); }
+.suggest button { display: block; width: 100%; min-height: 42px; border: 0; border-radius: 0; color: var(--ink); text-align: left; font-weight: 500; background: transparent; }
+.suggest button:hover { background: var(--sage-soft); }
+.suggest button:active { background: var(--pick-bg); color: var(--pick-ink); font-weight: 700; }
+.suggest button:active small { color: var(--pick-ink); }
+.suggest small { display: block; color: var(--muted); font-weight: 400; }
+.addr-state { margin: 0; font-size: .84rem; color: var(--good); font-weight: 500; }
+.addr-state.miss { color: var(--warn); }
+
+/* 분석 영역 */
+.report { min-width: 0; display: grid; gap: 16px; scroll-margin-top: 12px; }
+/* PC: 오른쪽 리포트도 자체 스크롤 (조건 설정과 따로 움직임), 탭 줄은 리포트 위쪽에 고정 */
+@media (min-width: 861px) {
+  .page { padding-bottom: 12px; }
+  .work { height: calc(100vh - 24px); align-items: stretch; }
+  .side { position: static; max-height: none; height: 100%; overscroll-behavior: contain; }
+  .report { height: 100%; overflow-y: auto; overscroll-behavior: contain; align-content: start; padding: 0 6px 6px 2px; }
+  .report .tabs { position: sticky; top: 0; z-index: 3; }
+}
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+.actions button:disabled { opacity: .6; cursor: default; }
+.action-note { flex: 1 1 100%; margin: 0; color: var(--muted); font-size: .86rem; text-align: right; }
+.action-note:empty { display: none; }
+.report-body { display: grid; gap: 16px; min-width: 0; }
+.report-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 2px 16px; padding: 18px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.report-head .kind { font-size: .84rem; color: var(--muted); }
+.report-head > .kind:first-child { grid-column: 1; grid-row: 1; }
+.report-head h2 { grid-column: 1; grid-row: 2; }
+.report-head > .kind:not(:first-child) { grid-column: 2; text-align: right; }
+.report-head > .kind:nth-child(3) { grid-row: 1; }
+.report-head > .kind:nth-child(4) { grid-row: 2; }
+.report-head h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.3; margin: 2px 0 0; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--sage-soft); color: var(--sage-deep); font-weight: 600; font-size: .8rem; }
+
+/* 지표 카드 */
+.kpis { display: grid; grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); min-width: 0; display: grid; align-content: start; gap: 2px; }
+.kpi span { color: var(--muted); font-size: .8rem; font-weight: 600; }
+.kpi b { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.kpi small { color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.kpi.main { background: var(--sage-deep); border-color: var(--sage-deep); color: var(--on-sage); }
+.kpi.main span, .kpi.main small { color: var(--on-sage); opacity: .82; }
+.kpi.main .score { color: var(--on-sage); }
+.score { font-size: 2.6rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.04em; color: var(--sage-deep); font-variant-numeric: tabular-nums; }
+.score small { font-size: 1rem; font-weight: 500; opacity: .75; }
+.verdict b { display: block; font-size: 1rem; font-weight: 700; }
+.verdict span { font-size: .8rem; }
+
+/* 탭 */
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; scrollbar-width: none; box-shadow: var(--shadow); }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 1 0 auto; border: 1px solid transparent; background: var(--btn-bg); color: var(--btn-ink); min-height: 40px; border-radius: 8px; white-space: nowrap; }
+.tabs button:hover { border-color: var(--pick-bg); }
+.tabs button[aria-selected="true"] { background: var(--pick-bg); border-color: var(--pick-bg); color: var(--pick-ink); font-weight: 700; }
+.panel { display: grid; gap: 16px; min-width: 0; }
+.panel-title { display: none; margin: 8px 0 0; font-size: 1.15rem; font-weight: 800; padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
+.report-body[data-tab] .panel { display: none; }
+.report-body[data-tab="sum"] .panel[data-panel="sum"], .report-body[data-tab="place"] .panel[data-panel="place"],
+.report-body[data-tab="pop"] .panel[data-panel="pop"], .report-body[data-tab="rent"] .panel[data-panel="rent"],
+.report-body[data-tab="check"] .panel[data-panel="check"] { display: grid; }
+.report-body:not([data-tab]) .panel-title { display: block; }
+.report-body:not([data-tab]) .tabs { display: none; }
+
+/* 카드 블록 */
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; box-shadow: var(--shadow); min-width: 0; }
+.block h3 { font-size: 1rem; font-weight: 700; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+.block h3::before { content: ""; width: 4px; height: 1em; border-radius: 2px; background: var(--accent); }
+.block ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.scale { display: grid; grid-template-columns: 20fr 10fr 30fr 20fr 20fr; gap: 3px; margin-bottom: 4px; }
 .seg { min-width: 0; }
-.seg i { display: block; height: 14px; background: var(--track); overflow: hidden; }
+.seg i { display: block; height: 10px; background: var(--track); overflow: hidden; border-radius: 3px; }
 .seg i b { display: block; height: 100%; background: var(--sage); }
-.seg em { display: block; font-style: normal; font-size: .78rem; color: var(--muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg em { display: block; font-style: normal; font-size: .74rem; color: var(--muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rows { display: grid; }
-.row { display: grid; grid-template-columns: 7.5em 4.2em minmax(0, 1fr); gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-.row .pts { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.row { display: grid; grid-template-columns: 7.5em 4.4em minmax(0, 1fr); gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.row:last-child { border-bottom: 0; }
+.row .pts { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
 .row .pts small { font-weight: 400; color: var(--muted); }
 .row p { margin: 0; color: var(--muted); }
-.block h3 { font-size: 1.05rem; margin: 0 0 8px; }
-.block ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
-.flag { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; padding: 8px 12px; border-radius: 6px; }
-.flag b { flex: none; font-size: .9rem; }
+.flag { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; padding: 8px 12px; border-radius: 8px; font-size: .92rem; }
+.flag b { flex: none; font-size: .84rem; }
 .flag.ok { background: var(--good-soft); } .flag.ok b { color: var(--good); }
 .flag.wait { background: var(--warn-soft); } .flag.wait b { color: var(--warn); }
 .flag.stop { background: var(--bad-soft); } .flag.stop b { color: var(--bad); }
 .summary { margin: 0; }
 .checks li { padding-left: 1.5em; text-indent: -1.5em; }
 .checks li::before { content: "□"; display: inline-block; width: 1.5em; text-indent: 0; color: var(--sage-deep); }
-.foot { border-top: 1px solid var(--line); padding-top: 12px; font-size: .9rem; color: var(--muted); }
+.foot { padding: 14px 4px 0; font-size: .82rem; color: var(--muted); text-align: center; display: grid; gap: 2px; }
 .foot p { margin: 0; }
+.foot p:first-child { font-weight: 700; color: var(--ink); }
 .mini { display: none; }
-.suggest { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
-[hidden] { display: none !important; }
-.suggest li + li { border-top: 1px solid var(--line); }
-.suggest button { display: block; width: 100%; min-height: 44px; border: 0; border-radius: 0; color: var(--ink); text-align: left; font-weight: 400; background: transparent; }
-.suggest small { display: block; color: var(--muted); }
-.addr-state { margin: 0; font-size: .92rem; color: var(--good); }
-.addr-state.miss { color: var(--warn); }
-.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.fact span { display: block; color: var(--muted); font-size: .9rem; }
-.fact b { font-size: 1.15rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.fact { padding: 10px 12px; background: var(--bg); border-radius: 8px; }
+.fact span { display: block; color: var(--muted); font-size: .82rem; }
+.fact b { font-size: 1.1rem; font-weight: 800; }
 .bars { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
-.bars li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3em; gap: 8px; align-items: center; }
-.bars i { display: block; height: 12px; background: var(--track); }
-.bars i b { display: block; height: 100%; background: var(--sage); }
+.bars li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3em; gap: 8px; align-items: center; font-size: .9rem; }
+.bars i { display: block; height: 10px; background: var(--track); border-radius: 3px; position: relative; }
+.bars i b { display: block; height: 100%; background: var(--sage); border-radius: 3px; }
 .bars span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-.near { display: grid; gap: 4px; }
-.near li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-block: 5px; }
-.near span:last-child { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
-.bars i { position: relative; }
 .bars i u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); text-decoration: none; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; position: sticky; top: -1px; z-index: 2; background: var(--surface); padding-block: 8px; }
-.actions button { background: var(--sage-deep); border-color: var(--sage-deep); color: var(--bg); }
-.actions button:disabled { opacity: .6; cursor: default; }
-.action-note { flex: 1 1 100%; margin: 0; color: var(--muted); font-size: .92rem; }
-.action-note:empty { display: none; }
-.report-body { display: grid; gap: 22px; min-width: 0; }
-.caution { margin: 10px 0 0; padding: 10px 12px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); font-weight: 500; }
-.map-wrap { display: grid; gap: 6px; }
-.map-wrap canvas { display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; }
-.map-link { color: var(--sage-deep); font-weight: 500; }
-.heat { display: grid; gap: 4px; margin-top: 10px; }
+.bars.stack s { position: absolute; left: 0; top: 0; bottom: 0; background: var(--sage-deep); text-decoration: none; border-radius: 3px; }
+.bars.stack b { background: var(--d2); }
+.bars.pareto li { grid-template-columns: 7.5em minmax(0, 1fr) 5.6em; }
+.bars.pareto small { color: var(--muted); }
+.near { display: grid; gap: 4px; }
+.near li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-block: 5px; font-size: .92rem; }
+.near span:last-child { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.caution { margin: 10px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-weight: 600; font-size: .9rem; }
+.map-wrap { display: grid; gap: 8px; }
+.map-wrap canvas { display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
+.map-link { color: var(--sage-deep); font-weight: 600; font-size: .9rem; }
+.heat { display: grid; gap: 6px; margin-top: 10px; }
 .heat.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .heat.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.heat div { padding: 10px 8px; border-radius: 4px; text-align: center; min-width: 0; }
-.heat span { display: block; font-size: .86rem; }
-.heat b { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.heat div { padding: 10px 8px; border-radius: 8px; text-align: center; min-width: 0; }
+.heat span { display: block; font-size: .82rem; }
+.heat b { display: block; font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 .heat .d1 { background: var(--d1); color: var(--d-ink); } .heat .d2 { background: var(--d2); color: var(--d-ink); }
 .heat .d3 { background: var(--d3); color: var(--d-ink); } .heat .d4 { background: var(--d4); color: var(--d-ink-strong); }
 .heat .d5 { background: var(--d5); color: var(--d-ink-strong); }
-.range { position: relative; height: 14px; margin: 14px 0 8px; background: var(--track); }
-.range i { position: absolute; top: 0; bottom: 0; background: var(--sage); }
+.range { position: relative; height: 12px; margin: 14px 0 8px; background: var(--track); border-radius: 3px; }
+.range i { position: absolute; top: 0; bottom: 0; background: var(--sage); border-radius: 3px; }
 .range u { position: absolute; top: -4px; bottom: -4px; width: 3px; background: var(--ink); text-decoration: none; }
-.ai-block { padding: 14px 16px; border-radius: 6px; background: var(--sage-soft); }
+.ai-block { background: var(--sage-soft); border-color: transparent; }
 .ai-text { white-space: pre-line; margin: 0; }
-.ai-mark { margin: 8px 0 0; color: var(--muted); font-size: .88rem; }
-.sub { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
+.ai-mark { margin: 8px 0 0; color: var(--muted); font-size: .84rem; }
+#aiCopy { margin-top: 10px; }
+.sub { margin: 0 0 8px; color: var(--muted); font-size: .84rem; }
 .trend { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
-.trend li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
-.trend i { display: block; height: 12px; background: var(--track); }
-.trend i b { display: block; height: 100%; background: var(--sage); }
+.trend li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; font-size: .9rem; }
+.trend i { display: block; height: 10px; background: var(--track); border-radius: 3px; }
+.trend i b { display: block; height: 100%; background: var(--sage); border-radius: 3px; }
 .trend small { color: var(--muted); }
-@media (min-width: 861px) { .report { max-height: calc(100vh - 32px); overflow-y: auto; } }
+.tag { display: inline-block; font-size: .72rem; font-weight: 600; padding: 0 6px; margin-left: 6px; border-radius: 4px; vertical-align: middle; background: var(--sage-soft); color: var(--sage-deep); }
+.tag.hand { background: var(--warn-soft); color: var(--warn); }
+.assume { font-size: .86rem; color: var(--muted); margin: 0; }
+.assume li { padding-left: 1em; text-indent: -1em; }
+.diag li { display: grid; grid-template-columns: 7em auto 4.6em minmax(0, 1fr); gap: 4px 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.diag li:last-child { border-bottom: 0; }
+.diag .dm { display: inline-flex; gap: 3px; }
+.diag .dm i { width: 18px; height: 8px; background: var(--track); border-radius: 2px; }
+.diag .dm i.on { background: var(--sage-deep); }
+.diag b { font-size: .88rem; }
+.diag small { color: var(--muted); font-size: .84rem; }
+.tbl { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+.tbl th, .tbl td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+.tbl th:first-child, .tbl td:first-child { text-align: left; }
+.tbl th { color: var(--muted); font-weight: 600; background: var(--bg); }
+.two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.two-col > * { min-width: 0; }
+
+/* 유동인구: 시간대마다 한 줄 (이름 + 많음·보통·적음) */
+.flow-row { grid-template-columns: 7.2em minmax(0, 1fr); align-items: center; gap: 8px; }
+@media (max-width: 380px) { .flow-row { grid-template-columns: 6.4em minmax(0, 1fr); } .flow-row .q { font-size: .84rem; } }
+.flow-row .chips { flex-wrap: nowrap; gap: 4px; }
+.flow-row .chip { flex: 1 1 0; min-width: 0; max-width: 5.2em; }
+.flow-row .chip span { justify-content: center; padding-inline: 0; white-space: nowrap; }
+/* 현장 가감점: -10 ~ +10 일곱 칸을 한 줄에 같은 폭으로 */
+.adj-row .chips { flex-wrap: nowrap; gap: 4px; }
+.adj-row .chip { flex: 1 1 0; min-width: 0; }
+.adj-row .chip span { justify-content: center; padding-inline: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* 계약 전 확인: 항목마다 한 줄 (항목명 + 확인함·미확인·문제 있음) */
+.risk-row { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.risk-row .chips { flex-wrap: nowrap; }
+.risk-row .chip span { padding-inline: 9px; white-space: nowrap; }
+/* 연남동 권역: 1~5권역을 위에서 아래로 차례대로 */
+#zoneBox .chips { flex-direction: column; }
+#zoneBox .chip span { width: 100%; }
+
+@media (max-width: 1180px) {
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kpi.main { grid-column: span 3; }
+  .two-col { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-width: 860px) {
+  header { padding-top: 22px; }
   .work { grid-template-columns: minmax(0, 1fr); }
-  .report { position: static; }
-  .mini { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--sage-deep); color: var(--bg); text-decoration: none; font-weight: 500; padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .side { position: static; max-height: none; }
+  .report { scroll-margin-top: 8px; }
+  .actions { justify-content: stretch; }
+  .actions button { flex: 1 1 auto; }
+  .action-note { text-align: left; }
+  textarea, input[type="text"], input[type="number"] { font-size: 16px; }
+  .chip span { min-height: 40px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi.main { grid-column: span 2; }
+  .tabs { position: sticky; top: 0; z-index: 3; }
+  .bars li { grid-template-columns: 6em minmax(0, 1fr) 3.2em; }
+  .bars.pareto li { grid-template-columns: 6em minmax(0, 1fr) 5.4em; }
+  .diag li { grid-template-columns: 6.4em auto minmax(0, 1fr); }
+  .diag small { grid-column: 1 / -1; }
+  .mini { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--btn-bg); color: var(--btn-ink); border-top: 1px solid var(--btn-line); box-shadow: 0 -4px 16px rgba(20, 28, 43, .08); text-decoration: none; font-weight: 600; padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .mini:active { background: var(--pick-bg); color: var(--pick-ink); font-weight: 700; }
 }
 @media (max-width: 460px) {
+  .block { padding: 16px; }
   .row { grid-template-columns: minmax(0, 1fr) auto; }
   .row p { grid-column: 1 / -1; }
-  .seg em { font-size: .7rem; }
+  .seg em { font-size: .66rem; }
+  .report-head h2 { font-size: 1.3rem; }
+  .score { font-size: 2.3rem; }
 }
 @media (prefers-reduced-motion: no-preference) { .seg i b { transition: width .25s ease; } }
+
+/* PDF로 저장(이미지 PDF)용 화면: 그림자 없이 종이 느낌으로 */
+.pdf-mode { display: block !important; background: #fff; }
+.pdf-mode, .pdf-mode * { box-shadow: none !important; }
+.pdf-mode .pdf-unit { padding-bottom: 2px; display: grid; gap: 10px; }
+.pdf-mode .kpi b { font-size: 1.2rem; }
+.pdf-mode .score { font-size: 2.3rem; }
+.pdf-mode .panel-title { display: block; margin: 0 0 8px; font-size: 1.05rem; }
+.pdf-mode .block { border-color: #e1e6ee; }
+.pdf-mode .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.pdf-mode .report-head { margin: 10px 0; }
+.pdf-mode .kpis { grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); }
+.pdf-mode .kpi.main { grid-column: auto; }
+.pdf-mode .map-link { display: none; }
+.pdf-cover { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 2px solid #141c2b; }
+.pdf-cover h1 { margin: 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; }
+
+/* 인쇄·텍스트 PDF: A4 세로 1단으로 이어 채우기 (섹션마다 새 쪽을 시작하지 않고, 줄·카드·지도는 자르지 않음) */
+@page { size: A4 portrait; margin: 12mm; }
+@media print {
+  :root { --bg: #f3f5f8; --surface: #fff; --shadow: none; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+  body { background: #fff; font-size: 9.5pt; line-height: 1.5; }
+  .side, .actions, .mini, .tabs, .map-link { display: none !important; }
+  header { padding: 0 0 3mm; display: flex; align-items: center; justify-content: space-between; text-align: left; border-bottom: 2px solid #141c2b; margin-bottom: 3mm; }
+  header h1 { font-size: 15pt; margin: 0; }
+  header p { display: none; }
+  header .sample-note { font-size: 7.5pt; padding: 2px 8px; margin: 0; }
+  .page { padding: 0; max-width: none; display: block; }
+  .work, .report, .report-body { display: block !important; }
+  .report { position: static !important; max-height: none !important; overflow: visible !important; padding: 0 !important; }
+  .report-head { margin-bottom: 3mm; padding: 3mm 5mm; break-inside: avoid; }
+  .kpis { grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); gap: 2.5mm; margin-bottom: 4mm; break-inside: avoid; }
+  .kpi { padding: 3mm; }
+  .kpi.main { grid-column: auto; }
+  .kpi b { font-size: 12pt; }
+  .score { font-size: 20pt; }
+  .report-body .panel { display: block !important; }
+  .report-body .panel-title { display: block !important; font-size: 11.5pt; margin: 2mm 0 2mm; break-after: avoid; }
+  .block { display: block; padding: 3.5mm 4.5mm; margin: 0 0 3.5mm; break-inside: auto; border-radius: 6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .block h3, .panel-title { break-after: avoid; }
+  .row, li, tr, .facts, .heat, .scale, .range, .kpi, .map-wrap, canvas { break-inside: avoid; }
+  .two-col { display: block; }
+  .two-col > .block { margin: 0 0 3.5mm; }
+  .block h3 { font-size: 10.5pt; margin-bottom: 2mm; }
+  .row { font-size: 9pt; padding: 1.6mm 0; }
+  .map-wrap canvas { width: 88%; max-width: 88%; margin: 0 auto; }
+  .foot { padding-top: 2mm; font-size: 7.5pt; break-inside: avoid; }
+  a { color: inherit; }
+}
 </style>
 
 <div class="page">
   <header>
-    <h1>상가 입지 리포트</h1>
+    <h1 class="title-line"><span class="mark" aria-hidden="true">M</span><span>메디넷 상가 입지 리포트</span></h1>
     <p>주소를 고르면 주변 동일업종, 주요상권, 행정동 유동인구가 공공데이터로 자동 입력됩니다. 지금은 마포구 주소를 찾을 수 있습니다.</p>
     <span class="sample-note">공개용 시제품입니다. 처음 보이는 값은 예시이며, 결과는 상담 참고용입니다.</span>
   </header>
   <div class="work">
-    <form class="form" id="form" autocomplete="off"></form>
+    <aside class="side" aria-label="조건 설정">
+      <div class="side-head">조건 설정 <small>제목을 누르면 접고 펼칩니다</small></div>
+      <form class="form" id="form" autocomplete="off"></form>
+    </aside>
     <section class="report" id="report">
       <div class="actions">
         <button type="button" id="aiBtn">AI 상담 문장 만들기</button>
         <button type="button" id="pdfBtn">PDF로 저장</button>
+        <button type="button" id="printBtn">인쇄·텍스트 PDF</button>
         <p class="action-note" id="actionNote" role="status"></p>
       </div>
       <div class="report-body" id="reportBody"></div>
@@ -177,7 +370,7 @@ button { min-height: 44px; padding: 8px 16px; font: inherit; font-weight: 500; c
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="mapo-data.js?v=20261110b" charset="utf-8"></script>
+<script src="mapo-data.js?v=20261110v3" charset="utf-8"></script>
 <script>
 const BIZ = {
   cafe:    { label: "카페",   type: "cluster", fit: { young: 20, tour: 20, office: 14, local: 8 } },
@@ -221,14 +414,47 @@ function applyZone() {
 }
 const CONVERSION_RATE = 0.06;
 const FLOW = [
+  { key: "morning", q: "오전 (6~11시)", rank: "mor" },   // v3: 오전 추가 (공공데이터 시간대 구간 06~11시)
   { key: "weekday", q: "오후 (11~17시)", rank: "day" },
   { key: "evening", q: "저녁 (17~21시)", rank: "eve" },
   { key: "weekend", q: "주말 (토·일)", rank: "end" }
 ];
 const TIME_LABELS = ["0~6시", "6~11시", "11~14시", "14~17시", "17~21시", "21~24시"];
 const AGE_LABELS = ["10대", "20대", "30대", "40대", "50대", "60대 이상"];
-const AUTO_KEYS = ["compete", "weekday", "evening", "weekend", "customer", "station"];
-const FLOW_OPTS = [["high", "많음", 10], ["mid", "보통", 6], ["low", "적음", 2]];
+const AUTO_KEYS = ["compete", "morning", "weekday", "evening", "weekend", "customer", "station", "activity"];
+// v2: 유동인구 30점 = 행정동 시간대 15점(5점씩) + 주소 단위 상권 활력 15점
+const FLOW_OPTS = [["high", "많음", 5], ["mid", "보통", 3], ["low", "적음", 1]];
+const TRDAR_NEAR_TEXT = 100;   // 아래 TRDAR_NEAR와 같은 값 (입력지 안내문은 그보다 먼저 만들어집니다)
+const ACTIVITY_OPTS = [["high", "활발", 15], ["mid", "보통", 9], ["low", "한산", 3]];
+const ACT = DATA.act || { radius: 150 };
+function activityInfo(a) {
+  if (!a || !(a[8] >= 0)) return null;
+  return { pct: a[8], count: a[9], level: a[8] >= 66.7 ? "high" : a[8] <= 33.3 ? "low" : "mid" };
+}
+// v2: 지번별 현장 의견(중개사 메모·가감점). 이 브라우저에만 저장되며 공개 저장소에 올라가지 않습니다.
+const FIELD_KEY = "sangga-field-notes-v1";
+const FIELD_ADJ = [-10, -5, -3, 0, 3, 5, 10];
+function fieldStore() {
+  try { return JSON.parse(localStorage.getItem(FIELD_KEY) || "{}") || {}; } catch (e) { return {}; }
+}
+function fieldSave(store) {
+  try { localStorage.setItem(FIELD_KEY, JSON.stringify(store)); return true; } catch (e) { return false; }
+}
+function loadField() {
+  const saved = place ? fieldStore()[place[0]] : null;
+  state.fieldAdj = saved ? Number(saved.adj) || 0 : 0;
+  state.fieldNote = saved ? saved.note || "" : "";
+  const form = document.getElementById("form");
+  form.elements.fieldAdj.value = String(state.fieldAdj);
+  form.elements.fieldNote.value = state.fieldNote;
+}
+function storeField() {
+  if (!place) return;
+  const store = fieldStore();
+  if (!state.fieldAdj && !state.fieldNote.trim()) delete store[place[0]];
+  else store[place[0]] = { adj: state.fieldAdj, note: state.fieldNote, updated: new Date().toISOString().slice(0, 10) };
+  fieldSave(store);
+}
 const COMPETE = { cluster: { dense: 6, many: 10, mid: 7, few: 4 }, local: { few: 10, mid: 6, many: 2, dense: 0 } };
 const COMPETE_LABEL = { dense: "과밀", many: "많음", mid: "보통", few: "적음" };
 const DENSE_RATIO = 2;
@@ -247,24 +473,32 @@ const SAMPLE = {
   address: "연남동 229-64", biz: "cafe", customer: "young", compete: "many",
   storeFloor: "first", visibility: "good", station: "mid", road: "main", access: "easy",
   customBiz: "", customType: "cluster", customCore: "young",
-  weekday: "mid", evening: "high", weekend: "high", rent: 450, deposit: 9000, area: 66, zone: "zone1", marketRent: 0,
-  use: "ok", utility: "wait", premium: "wait", landlord: "ok"
+  morning: "mid", weekday: "mid", evening: "high", weekend: "high", rent: 450, deposit: 9000, area: 66, zone: "zone1", marketRent: 0,
+  use: "ok", utility: "wait", premium: "wait", landlord: "ok",
+  activity: "high", fieldAdj: 0, fieldNote: ""
 };
 let state = { ...SAMPLE };
 let place = null;
 const manual = new Set();
 let depositManual = false;
 
-function rankLevel(rank) {
-  const third = DATA.pop.n / 3;
+function rankLevel(rank, n = DATA.pop.n) {
+  const third = n / 3;
   if (rank <= third) return "high";
   return rank > third * 2 ? "low" : "mid";
 }
-function applyDong(dong) {
+function applyDong(dong, n = DATA.pop.n) {
   FLOW.forEach(item => {
-    if (!manual.has(item.key)) state[item.key] = rankLevel(dong[item.rank]);
+    if (!manual.has(item.key)) state[item.key] = rankLevel(dong[item.rank], n);
   });
-  if (!manual.has("customer")) state.customer = rankLevel(dong.ry) === "high" ? "young" : "local";
+  if (!manual.has("customer")) state.customer = rankLevel(dong.ry, n) === "high" ? "young" : "local";
+}
+// v2.1: 주소가 서울시 공식 상권 안(또는 100m 이내)이면 상권 단위 유동인구, 아니면 행정동 값을 씁니다.
+function popSource(a, dong) {
+  const hit = a && DATA.tpop ? trdarFor(a) : null;
+  const tp = hit && (hit.inside || hit.d <= TRDAR_NEAR) ? DATA.tpop[hit.t[0]] : null;
+  if (tp) return { kind: "trdar", p: tp, n: DATA.tpopMeta.n, inside: hit.inside, d: hit.d, label: `${tp.name} 상권`, unit: "상권", q: DATA.tpopMeta.q };
+  return dong ? { kind: "dong", p: dong, n: DATA.pop.n, label: dong.name, unit: "행정동", q: DATA.pop.q } : null;
 }
 
 const RADIUS = 300;
@@ -418,21 +652,25 @@ function calculate(s) {
   const biz = bizInfo(s);
   const location = LOCATION.reduce((sum, item) => sum + item.opts.find(o => o[0] === s[item.key])[2], floorScore(s));
   const compete = COMPETE[biz.type][s.compete];
-  const flow = FLOW.reduce((sum, item) => sum + FLOW_OPTS.find(o => o[0] === s[item.key])[2], 0);
+  const flowDong = Math.round(FLOW.reduce((sum, item) => sum + FLOW_OPTS.find(o => o[0] === s[item.key])[2], 0) / (FLOW.length * 5) * 15);   // 시간대 4개를 15점으로 환산
+  const flowAct = ACTIVITY_OPTS.find(o => o[0] === s.activity)[2];
+  const flow = flowDong + flowAct;
   const customer = biz.fit[s.customer];
   const price = priceScore(s);
   const earned = location + compete + flow + customer;
   const priceKnown = price.gap !== null;
-  const total = priceKnown ? earned + price.pts : Math.round(earned / 80 * 100);
+  const base = priceKnown ? earned + price.pts : Math.round(earned / 80 * 100);
+  const adj = Number(s.fieldAdj) || 0;
+  const total = Math.max(0, Math.min(100, base + adj));
   const stops = RISKS.filter(r => s[r.key] === "stop");
   const waits = RISKS.filter(r => s[r.key] === "wait");
-  return { location, compete, flow, customer, price, priceKnown, total, stops, waits };
+  return { location, compete, flow, flowDong, flowAct, customer, price, priceKnown, base, adj, total, stops, waits };
 }
 function verdict(r) {
   if (r.stops.length) return ["계약 전 해결 필요", `점수와 별도로 문제 ${r.stops.length}건을 먼저 풀어야 합니다.`];
   const check = r.waits.length ? `현장 확인 ${r.waits.length}건이 남았습니다.` : "확인 항목을 모두 마쳤습니다.";
   const tail = r.priceKnown ? check : `${check} 가격을 뺀 80점을 100점으로 환산했습니다.`;
-  if (r.total >= 80) return ["적극 검토", tail];
+  if (r.total >= 80) return ["검토 우선순위 높음", tail];
   if (r.total >= 60) return ["조건 확인 후 검토", tail];
   return ["신중 검토", tail];
 }
@@ -472,19 +710,27 @@ function buildForm() {
       <p class="help" id="competeHelp"></p></div>
     </fieldset>
     <fieldset><legend>유동인구 <small>30점</small></legend>
-      ${FLOW.map(i => `<div class="field"><span class="q">${i.q}</span>${chips(i.key, FLOW_OPTS)}</div>`).join("")}
-      <p class="help">서울 ${DATA.pop.n}개 행정동을 3등분해 상위는 많음, 하위는 적음으로 자동 선택합니다. 동 전체의 값이며, 직접 바꿀 수 있습니다.</p>
+      ${FLOW.map(i => `<div class="field flow-row"><span class="q">${i.q}</span>${chips(i.key, FLOW_OPTS)}</div>`).join("")}
+      <p class="help">${DATA.tpop ? `주소가 서울시 공식 상권 안(또는 ${TRDAR_NEAR_TEXT}m 이내)이면 서울 ${DATA.tpopMeta.n.toLocaleString()}개 상권의 면적당 유동인구 순위로, 상권 밖이면 서울 ${DATA.pop.n}개 행정동 순위로` : `서울 ${DATA.pop.n}개 행정동을`} 3등분해 상위는 많음, 하위는 적음으로 자동 선택합니다. 직접 바꿀 수 있습니다. (시간대 합계 15점)</p>
+      <div class="field"><span class="q">가게 앞 상권 활력 (반경 ${ACT.radius}m)</span>${chips("activity", ACTIVITY_OPTS)}
+        <p class="help" id="activityHelp"></p></div>
+    </fieldset>
+    <fieldset><legend>현장 의견 <small>±10점</small></legend>
+      <div class="field adj-row"><span class="q">중개사 현장 가감점</span>${chips("fieldAdj", FIELD_ADJ.map(n => [String(n), n > 0 ? `+${n}` : String(n)]))}</div>
+      <div class="field"><label for="fieldNote">현장 메모 (지번별 저장)</label><textarea id="fieldNote" name="fieldNote" rows="3" placeholder="예: 평일 점심 직장인 동선, 건물주 리모델링 예정, 맞은편 대형 카페 개점"></textarea>
+        <p class="help" id="fieldHelp">이 주소의 현장 의견은 이 컴퓨터 브라우저에만 저장되며 공개 저장소에는 올라가지 않습니다.</p></div>
+      <div class="field"><span class="q">현장 의견 백업</span><div class="chips"><button type="button" id="fieldExport">내보내기</button><label class="file-btn">불러오기<input type="file" id="fieldImport" accept="application/json"></label></div></div>
     </fieldset>
     <fieldset><legend>주 고객층 <small>20점</small></legend>
       <div class="field"><span class="q">이 자리의 주 고객</span>${chips("customer", Object.entries(CUSTOMERS))}</div>
-      <p class="help">20·30대 비중이 서울 상위 1/3이면 20·30대로 자동 선택합니다. 직장인과 관광객은 자료가 없어 직접 고릅니다.</p>
+      <p class="help">20·30대 비중이 서울 상위 1/3이면 20·30대로 자동 선택합니다(상권 안 주소는 상권 기준). 직장인과 관광객은 자료가 없어 직접 고릅니다.</p>
     </fieldset>
     <fieldset><legend>가격 수준 <small>20점</small></legend>
       <div class="field" id="marketBox"><label for="marketRent">주변 평균 평당 월세 (만원, 선택)</label><input type="number" id="marketRent" name="marketRent" min="0" step="0.1" inputmode="decimal">
         <p class="help">비워 두면 한국부동산원 상권 임대료로 적정 월세를 추정합니다. 현장 시세를 아시면 넣으세요. 넣은 값이 추정값보다 우선합니다.</p></div>
     </fieldset>
     <fieldset><legend>계약 전 확인 <small>점수 제외</small></legend>
-      ${RISKS.map(i => `<div class="field"><span class="q">${i.label}</span>${chips(i.key, RISK_OPTS)}</div>`).join("")}
+      ${RISKS.map(i => `<div class="field risk-row"><span class="q">${i.label}</span>${chips(i.key, RISK_OPTS)}</div>`).join("")}
     </fieldset>
     <button type="button" id="reset">예시로 되돌리기</button>`;
 }
@@ -506,6 +752,7 @@ let sample = null, downloads = null;
 
 function aiBlock() {
   if (aiFacts !== currentFacts || (!aiText && !aiBusy)) return "";
+  if (!window.claude) return `<div class="block ai-block" id="aiBlock"><h3>고객 상담 문구</h3><p class="sub">손님에게 그대로 읽어 주거나 문자·카카오톡으로 보낼 수 있도록, 이 리포트의 숫자로 자동 작성한 설명문입니다. 왼쪽 조건을 바꾸면 문구도 함께 바뀝니다.</p><p class="ai-text" id="aiText">${esc(aiText)}</p><p class="ai-mark">손님에게 전하기 전에 내용을 확인하세요.</p><button type="button" id="aiCopy" data-html2canvas-ignore>문구 복사</button></div>`;
   return `<div class="block ai-block"><h3>AI 상담 문장</h3><p class="ai-text" id="aiText">${esc(aiText || "작성 중입니다.")}</p><p class="ai-mark">AI 초안입니다. 손님에게 전하기 전에 내용을 확인하세요.</p></div>`;
 }
 function aiPrompt(facts) {
@@ -536,8 +783,39 @@ function aiErrorText(code) {
   if (code === "session_expired") return "다시 로그인한 뒤 눌러 주세요.";
   return "AI 문장을 만들지 못했습니다. 잠시 후 다시 눌러 주세요.";
 }
+// v2: claude.ai 밖(GitHub Pages, 휴대폰 등)에서는 같은 자료로 규칙 기반 상담 문장 초안을 만듭니다.
+let draftCtx = null;
+const josa = (w, pair) => { const c = String(w).charCodeAt(String(w).length - 1); const has = c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 > 0; return w + (has ? pair[0] : pair[1]); };
+function ruleDraft(c) {
+  // 손님에게 바로 설명할 수 있는 말로 씁니다. 점수 계산 용어(몇 점을 뺐다 등)는 쓰지 않습니다.
+  const sorted = [...c.compared].sort((x, z) => z[1] / z[2] - x[1] / x[2]);
+  const good = sorted.filter(x => x[1] / x[2] >= 0.7).slice(0, 2);
+  const weak = sorted.filter(x => x[1] / x[2] < 0.7).slice(-2).reverse();
+  const lines = [];
+  lines.push(`요약: ${c.address}에서 ${c.biz} 창업을 검토한 결과, 입지 점수는 100점 중 ${c.total}점으로 '${c.verdict}' 단계입니다. 공공데이터와 상담 내용을 바탕으로 한 참고 점수이며, 매출이나 창업 성공을 보장하지 않습니다.${c.adj ? ` 현장 확인 내용을 반영해 ${c.adj > 0 ? "+" : ""}${c.adj}점을 조정했습니다.` : ""}`);
+  lines.push("", "좋은 점:");
+  (good.length ? good : sorted.slice(0, 1)).forEach(x => lines.push(`- ${c.say[x[0]]}`));
+  lines.push("", "주의할 점:");
+  (weak.length ? weak : sorted.slice(-1)).forEach(x => lines.push(`- ${c.say[x[0]]}`));
+  lines.push(`- 유동인구는 가게 바로 앞이 아니라 ${c.popUnit} 전체를 기준으로 한 값이므로, 실제 동선은 현장에서 확인이 필요합니다.`);
+  if (c.range) lines.push("- 적정 월세는 위치와 건물 상태에 따라 실제 임대료와 차이가 있을 수 있습니다.");
+  lines.push("", "계약 전에 확인할 사항:");
+  const asks = [...c.stops.map(x => `${josa(x.label, ["은", "는"])} 문제가 있어 계약 전에 해결 방법을 확인해야 합니다.`), ...c.waits.map(x => `${josa(x.label, ["을", "를"])} 아직 확인하지 않았습니다.`)];
+  if (asks.length < 2) asks.push("점심·저녁 시간에 주변 같은 업종 가게의 손님 수를 직접 보시기를 권합니다.", "임대 조건(보증금·월세·권리금)의 근거를 임대인 측에 확인하시기를 권합니다.");
+  asks.slice(0, 3).forEach(q => lines.push(`- ${q}`));
+  return lines.join("\n");
+}
 async function askAi() {
   const button = document.getElementById("aiBtn");
+  if (!window.claude) {
+    aiFacts = currentFacts;
+    aiText = draftCtx ? ruleDraft(draftCtx) : "";
+    render();
+    setTab("sum");
+    document.getElementById("aiBlock")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setNote("요약 탭 아래에 고객 상담 문구를 만들었습니다. '문구 복사'로 복사해 문자·카카오톡에 붙여 넣을 수 있습니다.");
+    return;
+  }
   if (aiBusy) { aiControl?.abort(); return; }
   if (!sample && window.claude) sample = await window.claude.use("sample");
   if (!sample) { setNote("이 화면에서는 AI 문장을 쓸 수 없습니다. 컴퓨터 인터넷 창에서 claude.ai로 이 페이지를 열어 주세요."); return; }
@@ -573,49 +851,100 @@ async function askAi() {
     render();
   }
 }
+// v3: A4 세로 1단 PDF — 첫 장 위에 제목·주소·지표 카드, 바로 아래부터 블록을 차례로 이어 담습니다.
+//     섹션마다 새 쪽을 시작하지 않고, 쪽을 넘길 때는 줄·항목·표 행이 끝나는 자리에서만 넘깁니다(제목·지도·카드는 자르지 않음).
+const PDF = { w: 210, h: 297, m: 12, foot: 8 };
+PDF.bodyW = PDF.w - PDF.m * 2;
+PDF.bodyH = PDF.h - PDF.m * 2 - PDF.foot;
+function pdfHolder(width) {
+  const holder = document.createElement("div");
+  holder.className = "report-body pdf-mode";
+  holder.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px`;
+  document.body.appendChild(holder);
+  return holder;
+}
+async function shot(el) {
+  return html2canvas(el, { scale: 2, backgroundColor: "#ffffff", useCORS: true, onclone: doc => doc.documentElement.setAttribute("data-theme", "light") });
+}
+function textImage(text, px, color) {
+  const c = document.createElement("canvas"), ctx = c.getContext("2d");
+  const font = `${px}px Pretendard, "Pretendard Variable", "Malgun Gothic", sans-serif`;
+  ctx.font = font; c.width = Math.ceil(ctx.measureText(text).width) + 4; c.height = Math.ceil(px * 1.5);
+  ctx.font = font; ctx.fillStyle = color || "#5d6779"; ctx.textBaseline = "middle"; ctx.fillText(text, 2, c.height / 2);
+  return c;
+}
+function cutPoints(unit) {
+  // 넘겨도 되는 자리(캔버스 픽셀, scale 2): 줄·항목·표 행·블록이 끝나는 곳
+  const base = unit.getBoundingClientRect().top;
+  return [...new Set([...unit.querySelectorAll(".row, li, tr, .facts, .heat, .scale, .range, .block > p, .block, .two-col")]
+    .map(el => Math.round((el.getBoundingClientRect().bottom - base) * 2)))].sort((x, z) => x - z);
+}
 async function reportPdf() {
   const source = document.getElementById("reportBody");
-  const holder = document.createElement("div");
-  holder.className = "report-body";
-  holder.style.cssText = "position:fixed;left:-20000px;top:0;width:720px";
-  holder.innerHTML = source.innerHTML;
-  document.body.appendChild(holder);
-  const sourceMaps = source.querySelectorAll("canvas"), copyMaps = holder.querySelectorAll("canvas");
-  sourceMaps.forEach((map, i) => copyMaps[i].getContext("2d").drawImage(map, 0, 0));
-  copyMaps.forEach(map => { map.style.width = map.id === "zoneMap" ? "55%" : "85%"; map.style.margin = "0 auto"; });
-  const margin = 10, width = 190, height = 277, gap = 5;
-  const pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
-  let y = margin;
+  const copyCanvas = (from, to) => { const a = from.querySelectorAll("canvas"), b = to.querySelectorAll("canvas"); a.forEach((m, i) => b[i] && b[i].getContext("2d").drawImage(m, 0, 0)); };
+  const px = 760;                                        // 190mm 폭에 맞춘 그림 폭 (본문 약 10.5pt)
+  const holder = pdfHolder(px);
+  const units = [];
+  const addUnit = nodes => {
+    const unit = document.createElement("div");
+    unit.className = "pdf-unit";
+    nodes.forEach(([node, from]) => { unit.appendChild(node); if (from) copyCanvas(from, node); });
+    holder.appendChild(unit); units.push(unit);
+  };
+  const cover = document.createElement("div");
+  cover.innerHTML = `<div class="pdf-cover"><h1 class="title-line"><span class="mark" aria-hidden="true">M</span><span>메디넷 상가 입지 리포트</span></h1></div>`;
+  addUnit([[cover.firstElementChild], [source.querySelector(".report-head").cloneNode(true)], [source.querySelector(".kpis").cloneNode(true)]]);
+  source.querySelectorAll(".panel").forEach(panel => {
+    const title = panel.querySelector(".panel-title");
+    [...panel.children].filter(n => n !== title).forEach((item, i) => {
+      const nodes = [];
+      if (i === 0 && title) { const t = title.cloneNode(true); t.style.display = "block"; nodes.push([t]); }
+      nodes.push([item.cloneNode(true), item]);
+      addUnit(nodes);
+    });
+  });
+  addUnit([[source.querySelector(".foot").cloneNode(true)]]);
+  const pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const bottom = PDF.m + PDF.bodyH;
+  let y = PDF.m;
+  const newPage = () => { pdf.addPage(); y = PDF.m; };
   try {
-    for (const part of [...holder.children]) {
-      const canvas = await html2canvas(part, {
-        scale: 2, backgroundColor: "#ffffff", useCORS: true,
-        onclone: doc => doc.documentElement.setAttribute("data-theme", "light")
-      });
-      const fullHeight = canvas.height * width / canvas.width;
-      if (y > margin && y + fullHeight > margin + height) { pdf.addPage(); y = margin; }
-      let top = 0;
-      while (top < canvas.height) {
-        const room = Math.floor((margin + height - y) * canvas.width / width);
-        const piece = Math.min(room, canvas.height - top);
-        const page = document.createElement("canvas");
-        page.width = canvas.width; page.height = piece;
-        const ctx = page.getContext("2d");
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, page.width, page.height);
-        ctx.drawImage(canvas, 0, -top);
-        const pieceHeight = piece * width / canvas.width;
-        pdf.addImage(page.toDataURL("image/jpeg", 0.92), "JPEG", margin, y, width, pieceHeight);
-        top += piece; y += pieceHeight + gap;
-        if (top < canvas.height) { pdf.addPage(); y = margin; }
+    for (const unit of units) {
+      const cuts = cutPoints(unit);
+      const canvas = await shot(unit);
+      const mmPerPx = PDF.bodyW / canvas.width;
+      let from = 0;
+      while (from < canvas.height) {
+        const roomPx = Math.floor((bottom - y) / mmPerPx);
+        const rest = canvas.height - from;
+        let piece = rest;
+        if (rest > roomPx) {
+          const safe = cuts.filter(c => c > from + 80 && c <= from + roomPx && c < canvas.height).pop();
+          if (safe) piece = safe - from;                       // 줄이 끝나는 자리에서 넘김
+          else if (y <= PDF.m + 0.5) piece = roomPx;           // 한 쪽보다 긴 그림(지도 등)만 그 자리에서 나눔
+          else { newPage(); continue; }                        // 넘길 자리가 없으면 다음 쪽 처음부터
+        }
+        const part = document.createElement("canvas");
+        part.width = canvas.width; part.height = piece;
+        const ctx = part.getContext("2d"); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, part.width, piece); ctx.drawImage(canvas, 0, -from);
+        const h = piece * mmPerPx;
+        pdf.addImage(part.toDataURL("image/jpeg", 0.92), "JPEG", PDF.m, y, PDF.bodyW, h);
+        y += h + 3;
+        from += piece;
+        if (from < canvas.height) newPage();
       }
     }
   } finally {
     holder.remove();
   }
   const pages = pdf.getNumberOfPages();
+  const left = `메디넷부동산공인중개사사무소 · 메디넷 상가 입지 리포트 · ${state.address} · 작성일 ${new Date().toLocaleDateString("ko-KR")}`;
   for (let i = 1; i <= pages; i++) {
-    pdf.setPage(i); pdf.setFontSize(9); pdf.setTextColor(120);
-    pdf.text(`${i} / ${pages}`, 105, 292, { align: "center" });
+    pdf.setPage(i);
+    pdf.setDrawColor(225, 230, 238); pdf.setLineWidth(0.2); pdf.line(PDF.m, PDF.h - PDF.m - 4, PDF.w - PDF.m, PDF.h - PDF.m - 4);
+    const l = textImage(left, 22), r = textImage(`${i} / ${pages}`, 22);
+    pdf.addImage(l, "PNG", PDF.m, PDF.h - PDF.m - 3, l.width * 3 / l.height, 3);
+    pdf.addImage(r, "PNG", PDF.w - PDF.m - r.width * 3 / r.height, PDF.h - PDF.m - 3, r.width * 3 / r.height, 3);
   }
   return pdf;
 }
@@ -647,7 +976,16 @@ function startActions() {
   const pdfButton = document.getElementById("pdfBtn");
   aiButton.addEventListener("click", askAi);
   pdfButton.addEventListener("click", savePdf);
-  if (!window.claude) { aiButton.hidden = true; return; }  // AI 문장은 claude.ai 안에서만 됩니다
+  document.getElementById("printBtn").addEventListener("click", () => window.print());
+  aiButton.title = "손님에게 설명할 문장(요약·좋은 점·주의할 점·확인 질문)을 리포트 숫자로 만들어 요약 탭에 보여 줍니다";
+  document.getElementById("reportBody").addEventListener("click", e => {
+    if (e.target.id !== "aiCopy") return;
+    const text = document.getElementById("aiText")?.textContent || "";
+    const done = () => setNote("고객 상담 문구를 복사했습니다.");
+    const fallback = () => { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch (err) { setNote("복사하지 못했습니다. 문구를 직접 선택해 복사해 주세요."); } t.remove(); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+  });
+  if (!window.claude) { aiButton.textContent = "고객 상담 문구 만들기"; return; }  // claude.ai 밖에서는 리포트 숫자로 상담 문구를 만듭니다
   window.claude.use("sample").then(found => { sample = found; }).catch(() => {});
   window.claude.use("downloads").then(found => { downloads = found; }).catch(() => {});
 }
@@ -830,21 +1168,28 @@ function heatClass(v) {
 function heatCell(label, v) {
   return `<div class="${heatClass(v)}"><span>${label}</span><b>${v.toFixed(2)}배</b></div>`;
 }
-function denseSummary(d) {
-  const times = [["오전", d.am], ["오후", d.pm], ["저녁", d.eve]].sort((a, b) => b[1] - a[1]);
+function denseSummary(d, dong) {
+  // v2: "가장 붐빔"은 실제 시간당 비중(time 배열)으로, "서울 대비 강점"은 배수로 구분해 씁니다.
+  const t = dong && dong.time;
+  const perHour = t ? [["오전(6~11시)", t[1] / 5], ["점심(11~14시)", t[2] / 3], ["오후(14~17시)", t[3] / 3], ["저녁(17~21시)", t[4] / 4], ["밤(21~24시)", t[5] / 3]].sort((a, b) => b[1] - a[1]) : null;
+  const rel = [["오전", d.am], ["오후", d.pm], ["저녁", d.eve]].sort((a, b) => b[1] - a[1]);
   const gap = Math.round(Math.abs(d.we / d.wk - 1) * 100);
-  const week = gap < 3 ? "평일과 주말의 차이는 크지 않습니다" : `주말이 평일보다 ${gap}% ${d.we > d.wk ? "많습니다" : "적습니다"}`;
-  const subject = w => w + (w === "오후" ? "가" : "이");
-  return `${subject(times[0][0])} 가장 붐비고 ${subject(times[2][0])} 가장 한산합니다. ${week}.`;
+  const week = gap < 3 ? "평일과 주말의 차이는 크지 않습니다" : `주말 하루가 평일 하루보다 ${gap}% ${d.we > d.wk ? "많습니다" : "적습니다"}`;
+  const busy = perHour ? `시간당 인구는 ${perHour[0][0]}에 가장 많습니다. ` : "";
+  return `${busy}서울 평균 동과 비교하면 ${rel[0][0]} 시간대가 ${rel[0][1].toFixed(2)}배로 가장 강합니다. ${week}.`;
 }
-function dongBlock(dong) {
+function dongBlock(dong, src) {
   const d = dong.dense;
   const yoy = `${dong.yoy > 0 ? "+" : ""}${dong.yoy}%`;
-  return `<div class="block"><h3>${esc(dong.name)} 유동인구 밀도</h3>
-    <p class="summary">${denseSummary(d)}</p>
+  const trdar = src && src.kind === "trdar";
+  const note = trdar
+    ? `색이 진할수록 붐빕니다. 숫자는 서울 ${src.n.toLocaleString()}개 상권 평균을 1로 본 면적(㎡)당 배수입니다. 서울시 상권분석서비스 길단위인구-상권 ${esc(src.q)}. ${src.inside ? "이 주소가 속한 상권의 값입니다." : `이 주소는 상권 경계 밖 ${Math.round(src.d)}m라 가장 가까운 상권 값을 씁니다.`} 면적이 작은 주거지 상권은 배수가 높게 나올 수 있습니다. 1년 전 같은 분기 대비 전체 유동인구 ${yoy}.`
+    : `색이 진할수록 붐빕니다. 숫자는 서울 평균 행정동을 1로 본 배수이고, 시간대는 시간당 값으로 비교했습니다. 가게 앞이 아니라 동 전체 값입니다. 1년 전 같은 분기 대비 전체 유동인구 ${yoy}.`;
+  return `<div class="block"><h3>${esc(trdar ? src.label : dong.name)} 유동인구 밀도</h3>
+    <p class="summary">${denseSummary(d, dong).replace("서울 평균 동과", trdar ? "서울 평균 상권과" : "서울 평균 동과")}</p>
     <div class="heat three">${heatCell("오전 6~11시", d.am)}${heatCell("오후 11~17시", d.pm)}${heatCell("저녁 17~21시", d.eve)}</div>
     <div class="heat two">${heatCell("평일 하루 평균", d.wk)}${heatCell("주말 하루 평균", d.we)}</div>
-    <p class="sub" style="margin-top:8px">색이 진할수록 붐빕니다. 숫자는 서울 평균 행정동을 1로 본 배수이고, 시간대는 시간당 값으로 비교했습니다. 가게 앞이 아니라 동 전체 값입니다. 1년 전 같은 분기 대비 전체 유동인구 ${yoy}.</p>
+    <p class="sub" style="margin-top:8px">${note}</p>
     <p class="sub" style="margin-top:12px">연령대별 비중 (막대: ${esc(dong.name)}, 검은 눈금: 서울 평균)</p>
     ${compareBars(AGE_LABELS, dong.age, DATA.seoul.age)}
   </div>`;
@@ -869,7 +1214,7 @@ function osmPath(list, cx, cy, reach) {
   });
   return path;
 }
-function renderMapImage(a) {
+function renderMapImage(a, sameMatch) {
   const { w, h } = MAP_SIZE;
   const canvas = document.createElement("canvas");
   canvas.width = w; canvas.height = h;
@@ -880,9 +1225,11 @@ function renderMapImage(a) {
   ctx.fillStyle = "#f6f7f2"; ctx.fillRect(0, 0, w, h);
   const cell = 14, cols = Math.ceil(w / cell) + 1, rows = Math.ceil(h / cell) + 1;
   let grid = new Float32Array(cols * rows);
+  const dots = [];
   DATA.shops.forEach(shop => {
-    if (!DATA.catLife[shop[2]]) return;
+    if (sameMatch ? !sameMatch(shop) : !DATA.catLife[shop[2]]) return;
     const [x, y] = toMap(shop[0], shop[1]);
+    if (sameMatch) dots.push(px(x, y));
     const [sx, sy] = px(x, y);
     const c = Math.floor(sx / cell), r = Math.floor(sy / cell);
     if (c >= 0 && r >= 0 && c < cols && r < rows) grid[r * cols + c] += 1;
@@ -899,20 +1246,26 @@ function renderMapImage(a) {
     }
     grid = next;
   }
-  const peak = 3.2;
+  let peak = 3.2;
+  if (sameMatch) { const top = [...grid].sort((x, y) => y - x); peak = Math.max(0.3, top[Math.floor(top.length * 0.02)] || 0.3); }   // 동일업종은 화면 안 상위 2% 밀도를 가장 진하게
   const layer = document.createElement("canvas");
   layer.width = cols; layer.height = rows;
   const layerCtx = layer.getContext("2d");
   const image = layerCtx.createImageData(cols, rows);
+  const tint = sameMatch ? [214, 96, 28] : [62, 110, 84];
   for (let i = 0; i < grid.length; i++) {
     const v = Math.min(1, grid[i] / peak);
-    image.data[i * 4] = 62; image.data[i * 4 + 1] = 110; image.data[i * 4 + 2] = 84;
+    image.data[i * 4] = tint[0]; image.data[i * 4 + 1] = tint[1]; image.data[i * 4 + 2] = tint[2];
     image.data[i * 4 + 3] = v < 0.04 ? 0 : Math.round(v * 185);
   }
   layerCtx.putImageData(image, 0, 0);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(layer, -cell / 2, -cell / 2, cols * cell, rows * cell);
+  if (sameMatch) {
+    ctx.fillStyle = "rgba(140,52,10,.85)";
+    dots.forEach(([dx, dy]) => { if (dx >= 0 && dy >= 0 && dx <= w && dy <= h) { ctx.beginPath(); ctx.arc(dx, dy, 3, 0, Math.PI * 2); ctx.fill(); } });
+  }
   ctx.save();
   ctx.setTransform(scale, 0, 0, scale, w / 2 - cx * scale, h / 2 - cy * scale);
   ctx.lineCap = "round"; ctx.lineJoin = "round";
@@ -945,7 +1298,7 @@ function renderMapImage(a) {
     ctx.stroke(path);
   });
   ctx.restore();
-  const font = weight => `${weight} 19px "Noto Sans KR", "Malgun Gothic", sans-serif`;
+  const font = weight => `${weight} 19px Pretendard, "Pretendard Variable", "Malgun Gothic", sans-serif`;
   const label = (text, x, y, color) => {
     ctx.font = font(500); ctx.textAlign = "center"; ctx.lineJoin = "round";
     ctx.lineWidth = 5; ctx.strokeStyle = "#ffffff"; ctx.strokeText(text, x, y);
@@ -1022,7 +1375,7 @@ function renderZoneImage(a, zoneKey) {
     ctx.stroke(new Path2D(d));
   });
   ctx.restore();
-  const font = weight => `${weight} 22px "Noto Sans KR", "Malgun Gothic", sans-serif`;
+  const font = weight => `${weight} 22px Pretendard, "Pretendard Variable", "Malgun Gothic", sans-serif`;
   ctx.textAlign = "center";
   DATA.base.labels.forEach(([x, y, n]) => {
     const [sx, sy] = px(x, y);
@@ -1073,6 +1426,122 @@ function paintMap() {
   if (!mapCache.has(place[0])) mapCache.set(place[0], renderMapImage(place));
   canvas.getContext("2d").drawImage(mapCache.get(place[0]), 0, 0);
 }
+// ── v2.1 권역 분석: 300m·500m·1,000m 구성, 업종 집중도, 6개 축 진단, 동일업종 분포 ──
+const RINGS = [300, 500, 1000];
+const LEVEL5 = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"];
+const ringCache = new Map();
+function ringStats(a, s) {
+  const key = `${a[0]}|${s.biz}|${s.customBiz}`;
+  if (ringCache.has(key)) return ringCache.get(key);
+  const match = bizMatcher(s);
+  const rows = RINGS.map(r => ({ r, all: 0, same: 0, cats: new Map() }));
+  DATA.shops.forEach(shop => {
+    const d = meters(a[2], a[3], shop[0], shop[1]);
+    if (d > 1000) return;
+    const same = match && match(shop);
+    rows.forEach(row => {
+      if (d > row.r) return;
+      row.all += 1;
+      if (same) row.same += 1;
+      if (row.r === 300) row.cats.set(shop[2], (row.cats.get(shop[2]) || 0) + 1);
+    });
+  });
+  const first = rows[0];
+  const sorted = [...first.cats.entries()].sort((x, y) => y[1] - x[1]);
+  let run = 0, reach80 = 0;
+  for (const [, n] of sorted) { run += n; reach80 += 1; if (run >= first.all * 0.8) break; }
+  const top3 = sorted.slice(0, 3).reduce((t, c) => t + c[1], 0) / Math.max(1, first.all);
+  const out = { rows, top: sorted.slice(0, 12).map(([c, n]) => [DATA.cats[c], n]), kinds: sorted.length, reach80, top3,
+    shape: top3 >= 0.25 ? "집중형" : top3 >= 0.15 ? "일반형" : "분산형" };
+  ringCache.set(key, out);
+  return out;
+}
+const pctCache = new Map();
+function sameCountPct(s, count) {
+  const key = `${s.biz}|${s.customBiz}`;
+  if (!pctCache.has(key)) {
+    const match = bizMatcher(s);
+    const list = match ? DATA.shops.filter(match) : [];
+    const counts = [];
+    for (let i = 0; i < DATA.addr.length; i += SAMPLE_STEP_JS) {
+      const a = DATA.addr[i];
+      counts.push(list.reduce((n, shop) => n + (meters(a[2], a[3], shop[0], shop[1]) <= RADIUS ? 1 : 0), 0));
+    }
+    pctCache.set(key, counts.sort((x, y) => x - y));
+  }
+  const arr = pctCache.get(key);
+  if (!arr.length) return null;
+  const below = arr.filter(c => c < count).length, same = arr.filter(c => c === count).length;
+  return (below + same / 2) / arr.length * 100;
+}
+const SAMPLE_STEP_JS = 8;
+let walkSorted = null;
+function walkPct(m) {
+  if (!walkSorted) walkSorted = DATA.addr.map(a => a[7]).filter(v => v >= 0).sort((x, y) => x - y);
+  return walkSorted.filter(v => v > m).length / walkSorted.length * 100;   // 가까울수록 높음
+}
+const level5 = pct => LEVEL5[Math.min(4, Math.max(0, Math.floor(pct / 20)))];
+function diagnosis(s, ring, src, act, station, trend) {
+  const axes = [];
+  const sameNow = ring.rows[0].same;
+  const sp = sameCountPct(s, sameNow);
+  if (sp !== null) axes.push(["직접 경쟁", sp, `300m 동일업종 ${sameNow}곳 · 500m ${ring.rows[1].same}곳`]);
+  if (act) axes.push(["상가 밀집", act.pct, `반경 ${ACT.radius}m 생활업종 ${act.count}곳`]);
+  if (src) axes.push(["유동인구", (1 - src.p.day / src.n) * 100, `${src.label} · 서울 ${src.n.toLocaleString()}개 ${src.unit} 중 오후 ${src.p.day.toLocaleString()}위`]);
+  if (src) axes.push(["20·30대 비중", (1 - src.p.ry / src.n) * 100, `${src.p.young}% · 서울 ${src.p.ry.toLocaleString()}위`]);
+  if (station) axes.push(["역 접근성", walkPct(station.walk), `${station.name}역 도보 ${station.walk.toLocaleString()}m`]);
+  if (trend && trend.recent && trend.recent.closeRate !== null && trend.mapo.closeRate) {
+    const ratio = trend.recent.closeRate / trend.mapo.closeRate;
+    const pct = ratio < 0.7 ? 90 : ratio < 0.9 ? 70 : ratio < 1.1 ? 50 : ratio < 1.3 ? 30 : 10;
+    axes.push(["상권 안정성", pct, `연 폐업률 ${trend.recent.closeRate.toFixed(1)}% (마포구 평균 ${trend.mapo.closeRate.toFixed(1)}%)${trend.recent.now < 10 ? " · 점포 수 적어 참고용" : ""}`]);
+  }
+  return axes.map(([axis, pct, note]) => ({ axis, pct, level: level5(pct), step: Math.min(5, Math.floor(pct / 20) + 1), note }));
+}
+function diagBlock(biz, axes) {
+  if (!axes.length) return "";
+  const high = axes.filter(x => x.step >= 4).map(x => x.axis), low = axes.filter(x => x.step <= 2).map(x => x.axis);
+  const read = `높은 편: ${high.length ? high.join(", ") : "없음"}. 낮은 편: ${low.length ? low.join(", ") : "없음"}.${axes.find(x => x.axis === "직접 경쟁" && x.step >= 4) ? ` 같은 업종 점포가 많아 차별화 전략을 함께 상담하는 것이 좋습니다.` : ""}${axes.find(x => x.axis === "역 접근성" && x.step <= 2) ? " 역에서 먼 편이라 버스·골목 동선과 간판 가시성을 현장에서 확인하세요." : ""}`;
+  return `<div class="block"><h3>권역 핵심 진단</h3>
+    <p class="summary">${read}</p>
+    <ul class="diag">${axes.map(x => `<li><span class="dl">${x.axis}</span><span class="dm" role="img" aria-label="${x.axis} ${x.level}">${[1, 2, 3, 4, 5].map(n => `<i class="${n <= x.step ? "on" : ""}"></i>`).join("")}</span><b>${x.level}</b><small>${esc(x.note)}</small></li>`).join("")}</ul>
+    <p class="sub" style="margin-top:8px">직접 경쟁·상가 밀집·역 접근성은 마포구 주소 안에서, 유동인구·20·30대 비중은 서울 상권(또는 행정동) 순위 안에서 상대 비교해 5단계로 나눴습니다. 상권 안정성은 마포구 평균 폐업률과 비교했습니다. 점수에는 넣지 않는 참고 진단입니다.</p>
+  </div>`;
+}
+function ringBlock(biz, ring) {
+  const max = Math.max(...ring.rows.map(r => r.all), 1);
+  const share = r => r.all ? (r.same / r.all * 100).toFixed(1) : "0.0";
+  const topMax = ring.top.length ? ring.top[0][1] : 1;
+  let cum = 0;
+  return `<div class="block"><h3>권역 상권 구성 (300m · 500m · 1,000m)</h3>
+    <table class="tbl"><thead><tr><th>반경</th><th>전체 상가</th><th>${esc(biz.label)}</th><th>비중</th></tr></thead>
+      <tbody>${ring.rows.map(r => `<tr><td>${r.r.toLocaleString()}m</td><td>${r.all.toLocaleString()}</td><td>${r.same.toLocaleString()}</td><td>${share(r)}%</td></tr>`).join("")}</tbody></table>
+    <ul class="bars stack" aria-label="반경별 전체 상가와 동일업종">${ring.rows.map(r => `<li><span>${r.r.toLocaleString()}m</span><i><b style="width:${r.all / max * 100}%"></b><s style="width:${r.same / max * 100}%"></s></i><span>${r.all.toLocaleString()}</span></li>`).join("")}</ul>
+    <p class="sub" style="margin-top:6px">막대: 전체 상가, 진한 부분: ${esc(biz.label)}. 반경이 넓어질수록 상가가 어떻게 쌓이는지 보여 줍니다.</p>
+    <h3 style="margin-top:16px">300m 업종 집중도</h3>
+    <div class="facts">
+      <div class="fact"><span>업종 수(소분류)</span><b>${ring.kinds}개</b></div>
+      <div class="fact"><span>상위 3개 업종 비중</span><b>${(ring.top3 * 100).toFixed(1)}%</b><span>${ring.shape}</span></div>
+      <div class="fact"><span>상가 80%를 채우는 업종</span><b>${ring.reach80}개</b></div>
+    </div>
+    <ul class="bars pareto" aria-label="300m 많은 업종과 누적 비중">${ring.top.map(([c, n]) => { cum += n; return `<li><span>${esc(c)}</span><i><b style="width:${n / topMax * 100}%"></b></i><span>${n} <small>누적 ${(cum / Math.max(1, ring.rows[0].all) * 100).toFixed(0)}%</small></span></li>`; }).join("")}</ul>
+    <p class="sub" style="margin-top:6px">상위 3개 비중 25% 이상은 집중형, 15~25%는 일반형, 15% 미만은 분산형으로 봅니다. 소상공인시장진흥공단 상가(상권)정보 ${SRC.shops}, 모든 업종 포함.</p>
+  </div>`;
+}
+function sameMapBlock(biz) {
+  if (!place) return "";
+  return `<div class="block map-wrap"><h3>${esc(biz.label)} 분포 지도</h3>
+    <canvas id="sameMap" width="${MAP_SIZE.w}" height="${MAP_SIZE.h}" role="img" aria-label="${esc(place[0])} 주변 ${esc(biz.label)} 밀도 지도"></canvas>
+    <p class="sub">주황이 진할수록 ${esc(biz.label)} 점포가 몰린 곳(핵밀도)이고, 점은 개별 점포입니다. 점선: 반경 300m. 같은 업종이 어디에 모여 있는지, 이 자리가 그 흐름 안인지 밖인지 볼 때 씁니다.</p>
+  </div>`;
+}
+function paintSameMap(biz) {
+  const canvas = document.getElementById("sameMap");
+  if (!canvas || !place) return;
+  const match = bizMatcher(state);
+  const key = `same|${place[0]}|${state.biz}|${state.customBiz}`;
+  if (!mapCache.has(key)) mapCache.set(key, renderMapImage(place, match));
+  canvas.getContext("2d").drawImage(mapCache.get(key), 0, 0);
+}
 function placeBlock(biz, around, area) {
   if (!around) return `<div class="block"><h3>주변 상가 자료</h3><p class="summary">주소를 찾지 못해 자동 집계를 하지 못했습니다. 주변 동일업종은 직접 고른 값으로 계산했습니다.</p></div>`;
   const max = around.top.length ? around.top[0][1] : 1;
@@ -1103,14 +1572,19 @@ function render() {
   const around = place ? surroundings(place, state) : null;
   const dong = place ? DATA.dongs[place[4]] : null;
   if (around && !around.noMatch && !manual.has("compete")) state.compete = around.level;
-  if (dong) applyDong(dong);
+  const src = place ? popSource(place, dong) : null;
+  if (src) applyDong(src.p, src.n);
   const station = place ? stationInfo(place) : null;
   if (station && !manual.has("station")) state.station = station.level;
+  const act = place ? activityInfo(place) : null;
+  if (act && !manual.has("activity")) state.activity = act.level;
   applyZone();
   syncAuto();
   const area = place ? majorArea(place) : "";
   const trend = place && state.biz !== "custom" ? trendInfo(state.biz) : null;
   const r = calculate(state), v = verdict(r);
+  const ring = place ? ringStats(place, state) : null;
+  const axes = ring ? diagnosis(state, ring, src, act, station, trend) : [];
   const scores = [["입지(위치)", r.location, 20], ["동일업종", r.compete, 10], ["유동인구", r.flow, 30], ["주 고객층", r.customer, 20], ["가격", r.price.pts, 20]];
   const compared = r.priceKnown ? scores : scores.slice(0, 4);
   const sorted = [...compared].sort((a, b) => b[1] / b[2] - a[1] / a[2]);
@@ -1139,9 +1613,19 @@ function render() {
   const stationWhy = station ? `${station.name}역까지 도보 약 ${station.min}분(${station.walk.toLocaleString()}m). ` : "";
   const countText = around && !around.noMatch ? `반경 300m ${around.count}곳, ` : "";
   const manualText = around && (around.noMatch || manual.has("compete")) ? " 직접 고른 값입니다." : "";
-  const flowWhy = FLOW.map(i => `${i.q.split(" ")[0]} ${FLOW_OPTS.find(o => o[0] === state[i.key])[1]}`).join(", ") + ".";
-  const customerWhy = dong
-    ? `20·30대 비중 ${dong.young}%. ${CUSTOMERS[state.customer]} 기준으로 계산했습니다.`
+  const actLabel = ACTIVITY_OPTS.find(o => o[0] === state.activity)[1];
+  const actWhy = act ? `반경 ${ACT.radius}m 생활업종 상가 ${act.count}곳, 마포구 주소 중 ${act.pct >= 50 ? `상위 ${Math.max(1, 100 - act.pct)}%` : `하위 ${Math.max(1, act.pct)}%`} 수준` : "주소 자동 집계 없음";
+  const srcRank = src ? `, 서울 ${src.n.toLocaleString()}개 ${src.unit} 중 오후 ${src.p.day.toLocaleString()}위` : "";
+  const flowWhy = `${src ? `${esc(src.label)}${src.kind === "trdar" && !src.inside ? `(경계 밖 ${Math.round(src.d)}m)` : ""} ` : ""}${src && src.kind === "trdar" ? "" : "행정동 "}시간대 ${r.flowDong}/15점(` + FLOW.map(i => `${i.q.split(" ")[0]} ${FLOW_OPTS.find(o => o[0] === state[i.key])[1]}`).join(", ") + `${srcRank}), 가게 앞 상권 활력 ${r.flowAct}/15점(${actLabel}, ${actWhy}${manual.has("activity") ? ", 직접 고른 값" : ""}).`;
+  document.getElementById("activityHelp").textContent = act
+    ? `${actWhy}입니다. 같은 동 안에서도 자리마다 달라지는 값입니다. 상위 1/3은 활발, 하위 1/3은 한산으로 자동 선택합니다.`
+    : "주소를 고르면 반경 안 상가 밀집도로 자동 선택합니다.";
+  document.getElementById("fieldHelp").textContent = place
+    ? (fieldStore()[place[0]] ? `이 주소의 현장 의견이 저장되어 있습니다(${fieldStore()[place[0]].updated}). 이 컴퓨터 브라우저에만 저장됩니다.` : "이 주소의 현장 의견은 이 컴퓨터 브라우저에만 저장되며 공개 저장소에는 올라가지 않습니다.")
+    : "주소를 고르면 지번별로 현장 의견을 저장합니다.";
+  const tag = key => manual.has(key) ? `<span class="tag hand">직접</span>` : `<span class="tag">자동</span>`;
+  const customerWhy = src
+    ? `${src.kind === "trdar" ? esc(src.label) + " " : ""}20·30대 비중 ${src.p.young}%. ${CUSTOMERS[state.customer]} 기준으로 계산했습니다.`
     : `${CUSTOMERS[state.customer]} 중심 상권입니다.`;
   const competeWhy = biz.type === "cluster"
     ? `${topic(biz.label)} 모일수록 유리한 업종입니다. ${countText}${COMPETE_LABEL[state.compete]}.${state.compete === "dense" ? " 다만 많음 기준의 2배를 넘어 경쟁 부담을 반영했습니다." : ""}${manualText}`
@@ -1168,48 +1652,128 @@ function render() {
     층수: FLOORS.find(f => f[0] === state.storeFloor)[1],
     가까운역: station ? `${station.name}역, 길을 따라 ${station.walk}m, 도보 약 ${station.min}분` : "자동 계산 없음",
     항목별점수: Object.fromEntries(compared.map(s => [s[0], `${s[1]}/${s[2]}`])),
+    권역진단: ring ? Object.fromEntries(axes.map(x => [x.axis, `${x.level} (${x.note})`])) : "없음",
+    권역구성: ring ? ring.rows.map(x => `${x.r}m 전체 ${x.all}곳, 동일업종 ${x.same}곳`) : "없음",
+    가게앞상권활력: act ? `반경 ${ACT.radius}m 생활업종 ${act.count}곳, 마포구 주소 중 백분위 ${act.pct}` : "자동 집계 없음",
+    현장의견: r.adj || state.fieldNote.trim() ? { 가감점: r.adj, 메모: state.fieldNote.trim() || "없음" } : "없음",
     점수방식: r.priceKnown ? "100점 만점" : "가격 비교 불가, 나머지 80점을 100점으로 환산",
     월세: gapText, 주변상가: around ? { 반경: "300m", 같은업종수: around.count, 수준: COMPETE_LABEL[state.compete], 주요상권: area, 많은업종: around.top.map(t => `${t[0]} ${t[1]}곳`) } : "자동 집계 없음",
-    유동인구: dong ? { 단위: "행정동 전체", 동: dong.name, 비교기준: "서울 평균 동을 1로 본 배수", 오전: dong.dense.am, 오후: dong.dense.pm, 저녁: dong.dense.eve, 평일: dong.dense.wk, 주말: dong.dense.we, 전년동기대비: `${dong.yoy}%`, 이십삼십대비중: `${dong.young}%` } : "자동 집계 없음",
+    유동인구: src ? { 단위: src.kind === "trdar" ? "서울시 공식 상권(면적당)" : "행정동 전체", 이름: src.label, 비교기준: src.kind === "trdar" ? `서울 ${src.n}개 상권 평균을 1로 본 면적당 배수` : "서울 평균 동을 1로 본 배수", 오후순위: `${src.p.day}/${src.n}`, 오전: src.p.dense.am, 오후: src.p.dense.pm, 저녁: src.p.dense.eve, 평일: src.p.dense.wk, 주말: src.p.dense.we, 전년동기대비: `${src.p.yoy}%`, 이십삼십대비중: `${src.p.young}%` } : "자동 집계 없음",
     상권5년흐름: trend && trend.recent ? { 주의: trend.recent.now < 10 ? "점포 수가 적어 비율이 크게 흔들릴 수 있음" : "없음", 출처: "서울시 상권분석서비스(추정치)", 상권: trend.inside ? trend.name : `${trend.name}(경계 밖 ${Math.round(trend.d)}m, 가장 가까운 상권)`, 상권안같은업종: `${trend.recent.now}곳`, 점포당월평균추정매출: trend.recent.per ? won(trend.recent.per) : "자료 없음", 마포구평균월매출: trend.mapo.per ? won(trend.mapo.per) : "자료 없음", 연폐업률: trend.recent.closeRate?.toFixed(1) + "%", 마포구평균폐업률: trend.mapo.closeRate?.toFixed(1) + "%", 연도별점포수: trend.years.map(y => `${y.y}년 ${y.n}곳(개업 ${y.open}, 폐업 ${y.close})`) } : "자료 없음",
     주고객층: CUSTOMERS[state.customer],
     공공참고임대료: rebRent() ? `${rebRent().name} 상권 평당 ${rebRent().pyeong.toFixed(1)}만원(1층, 전용+공용 면적, 보증금 환산 포함, 전용 평당과 직접 비교 불가)` : "없음",
     "계약 전 확인": Object.fromEntries(RISKS.map(item => [item.label, RISK_OPTS.find(o => o[0] === state[item.key])[1]]))
   });
   if (aiBusy && aiFacts !== currentFacts) aiControl?.abort();
-  if (!aiBusy) document.getElementById("aiBtn").textContent = aiFacts === currentFacts && aiText ? "AI 문장 다시 만들기" : "AI 상담 문장 만들기";
+  if (!aiBusy) document.getElementById("aiBtn").textContent = window.claude
+    ? (aiFacts === currentFacts && aiText ? "AI 문장 다시 만들기" : "AI 상담 문장 만들기")
+    : "고객 상담 문구 만들기";
+  draftCtx = {
+    address: state.address, biz: biz.label, total: r.total, verdict: v[0], adj: r.adj, compared, range: r.price.range,
+    stops: r.stops, waits: r.waits,
+    why: { "입지(위치)": stationWhy || "", "동일업종": competeWhy, "유동인구": flowWhy, "주 고객층": customerWhy, "가격": gapText },
+    popUnit: src && src.kind === "trdar" ? `${src.label}` : "행정동",
+    say: {
+      "입지(위치)": `${station ? `${station.name}역에서 걸어서 약 ${station.min}분 거리이고, ` : ""}${FLOORS.find(f => f[0] === state.storeFloor)[1]} 상가로 밖에서 ${VISIBILITY.find(o => o[0] === state.visibility)[1]}니다.`.replace("잘 보임니다", "잘 보입니다").replace("잘 안 보임니다", "잘 보이지 않습니다"),
+      "동일업종": around && !around.noMatch
+        ? `반경 300m 안에 같은 업종(${biz.label}) 가게가 ${around.count}곳 있습니다. ${biz.type === "cluster" ? (state.compete === "dense" ? "같은 업종이 모여 손님을 끄는 거리이지만, 경쟁이 매우 치열한 편입니다." : state.compete === "few" ? "같은 업종이 적어 손님을 끄는 거리 효과는 약한 편입니다." : "같은 업종이 모여 손님을 끄는 거리입니다.") : (state.compete === "few" ? "경쟁 가게가 적은 편입니다." : "동네 손님을 나눠 가져야 해 경쟁 부담이 있습니다.")}`
+        : `주변 같은 업종 수는 상담 내용으로 판단했습니다.`,
+      "유동인구": src ? `${src.label} 기준으로 오후 유동인구가 서울 ${src.n.toLocaleString()}개 ${src.unit} 중 ${src.p.day.toLocaleString()}위입니다.${act ? ` 가게 주변 150m 안에 생활 업종 상가가 ${act.count}곳 있어 ${act.level === "high" ? "거리가 활발한 편" : act.level === "low" ? "거리가 한산한 편" : "거리 활력은 보통"}입니다.` : ""}` : "유동인구 자료가 없는 주소입니다.",
+      "주 고객층": src ? `주변 유동인구 중 20·30대 비중이 ${src.p.young}%로, ${CUSTOMERS[state.customer]} 손님이 중심인 상권입니다.` : `${CUSTOMERS[state.customer]} 손님이 중심인 상권입니다.`,
+      "가격": r.price.range ? `이 자리의 적정 월세는 ${won(r.price.range.low)}~${won(r.price.range.high)} 정도로 보이며, 제시된 월세 ${won(state.rent)}${r.price.range.below ? "은 그보다 낮습니다. 낮은 이유(위치·건물 상태·권리금 등)를 확인하시기를 권합니다." : r.price.range.position.includes("안에") ? "은 적정 범위 안입니다." : "은 적정 범위보다 높습니다."}` : "주변 시세 자료가 없어 월세 수준은 현장 시세로 비교가 필요합니다."
+    }
+  };
+  if (!window.claude && aiText && aiFacts !== currentFacts) { aiFacts = currentFacts; aiText = ruleDraft(draftCtx); }
+  const kpi = (label, value, note) => `<div class="kpi"><span>${label}</span><b>${value}</b><small>${note}</small></div>`;
+  const kpiCards = [
+    kpi("유동인구 (오후)", src ? `${src.p.day.toLocaleString()}위` : "-", src ? `서울 ${src.n.toLocaleString()}개 ${src.unit} 중 · ${esc(src.label)}` : "주소를 고르세요"),
+    kpi(`반경 300m ${esc(biz.label)}`, around && !around.noMatch ? `${around.count.toLocaleString()}곳` : "-", around && !around.noMatch ? `${COMPETE_LABEL[state.compete]} · ${biz.type === "cluster" ? "모일수록 유리" : "많으면 불리"}` : "직접 고른 값"),
+    kpi("월세 판단", r.price.range ? r.price.range.position.replace("습니다", "음").replace("범위 안에 있음", "적정 범위") : r.priceKnown ? `${Math.abs(Math.round(r.price.gap * 100))}% ${r.price.gap >= 0 ? "높음" : "낮음"}` : "비교 불가", r.price.range ? `${won(r.price.range.low)}~${won(r.price.range.high)}` : "주변 시세를 넣으면 비교"),
+    kpi("가게 앞 상권 활력", act ? (act.pct >= 50 ? `상위 ${Math.max(1, 100 - act.pct)}%` : `하위 ${Math.max(1, act.pct)}%`) : "-", act ? `반경 ${ACT.radius}m 생활업종 ${act.count}곳` : "주소를 고르세요")
+  ].join("");
   document.getElementById("reportBody").innerHTML = `
     <div class="report-head"><span class="kind">입지 리포트 · ${biz.label} 창업 검토</span><h2>${esc(state.address || "주소를 입력하세요")}</h2>${inYeonnam() && state.zone ? `<span class="kind">${esc(RENT_ZONES.find(z => z[0] === state.zone)[1])}</span>` : ""}<span class="kind">작성일 ${new Date().toLocaleDateString("ko-KR")}</span></div>
-    <div class="result"><div class="score">${r.total}<small> /100</small></div><div class="verdict"><b>${v[0]}</b><span>${v[1]}</span></div></div>
+    <div class="kpis">
+      <div class="kpi main"><span>종합 점수</span><div class="score">${r.total}<small> /100</small></div><div class="verdict"><b>${v[0]}</b><span>${v[1]}${r.adj ? ` 자료 점수 ${r.base}점에 현장 의견 ${r.adj > 0 ? "+" : ""}${r.adj}점을 더했습니다.` : ""}</span></div></div>
+      ${kpiCards}
+    </div>
+    <nav class="tabs" role="tablist" aria-label="분석 항목" data-html2canvas-ignore>${TABS.map(([k, t]) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === activeTab}">${t}</button>`).join("")}</nav>
+    <section class="panel" data-panel="sum"><h2 class="panel-title">1. 요약</h2>
+    <div class="block"><h3>항목별 점수</h3>
     <div class="scale" role="img" aria-label="항목별 득점 막대. 총 ${r.total}점">${scores.map(s => seg(...s)).join("")}</div>
     <div class="rows">
       ${row("위치", r.location, 20, `${FLOORS.find(f => f[0] === state.storeFloor)[1]}, 밖에서 ${VISIBILITY.find(o => o[0] === state.visibility)[1]}. ${state.storeFloor === "upper" && upperFriendly(state) ? "윗층이 괜찮은 업종이라 층수 점수를 3점으로 봅니다. " : ""}${stationWhy}역 거리, 접한 길, 층과 가시성, 찾아오기를 5점씩 봅니다.`)}
-      ${row("주변 동일업종", r.compete, 10, competeWhy)}
-      ${row("유동인구", r.flow, 30, flowWhy)}
-      ${row("주 고객층", r.customer, 20, customerWhy)}
+      ${row("주변 동일업종", r.compete, 10, competeWhy + tag("compete"))}
+      ${row("유동인구", r.flow, 30, flowWhy + tag("activity"))}
+      ${row("주 고객층", r.customer, 20, customerWhy + tag("customer"))}
       ${r.priceKnown ? row("가격 수준", r.price.pts, 20, gapText) : `<div class="row"><b>가격 수준</b><span class="pts"><small>비교 불가</small></span><p>${gapText}</p></div>`}
+      ${r.adj || state.fieldNote.trim() ? row("현장 의견", (r.adj > 0 ? "+" : "") + r.adj, 10, esc(state.fieldNote.trim() || "메모 없음") + `<span class="tag hand">중개사</span>`) : ""}
+    </div>
     </div>
     <div class="block"><h3>상담 요약</h3><p class="summary">${summaryText}</p></div>
-    ${zoneMapBlock()}
+    ${diagBlock(biz, axes)}
+    ${aiBlock()}
+    </section>
+    <section class="panel" data-panel="place"><h2 class="panel-title">2. 입지·경쟁</h2>
     ${mapBlock()}
+    ${zoneMapBlock()}
+    <div class="two-col">
+    ${placeBlock(biz, around, area)}
+    </div>
+    ${ring ? ringBlock(biz, ring) : ""}
+    ${ring && bizMatcher(state) ? sameMapBlock(biz) : ""}
+    ${trendBlock(biz, trend)}
+    </section>
+    <section class="panel" data-panel="pop"><h2 class="panel-title">3. 유동인구</h2>
+    ${src ? dongBlock(src.p, src) : ""}
+    ${src ? "" : `<div class="block"><p class="summary">주소를 고르면 유동인구를 보여 줍니다.</p></div>`}
+    </section>
+    <section class="panel" data-panel="rent"><h2 class="panel-title">4. 임대료</h2>
     ${priceBlock(r.price.range)}
     ${rebBlock()}
-    ${placeBlock(biz, around, area)}
-    ${trendBlock(biz, trend)}
-    ${dong ? dongBlock(dong) : ""}
-    ${aiBlock()}
+    ${r.price.range || rebRent() ? "" : `<div class="block"><h3>임대료</h3><p class="summary">${gapText}</p></div>`}
+    </section>
+    <section class="panel" data-panel="check"><h2 class="panel-title">5. 계약 전 확인</h2>
     <div class="block"><h3>계약 전 확인</h3><ul>${flags}</ul></div>
     <div class="block"><h3>현장에서 볼 것</h3><ul class="checks">${FIELD_CHECKS[biz.type].map(t => `<li>${t}</li>`).join("")}</ul></div>
-    <div class="foot"><p>메디넷부동산공인중개사사무소 · 대표 정영숙 · 02-3141-8837</p><p>이 점수는 상담 참고용이며 계약 판단을 대신하지 않습니다.</p><p>자료: 소상공인시장진흥공단 상가(상권)정보 ${SRC.shops}, 주요상권 ${SRC.areas} 기준, 서울시 상권분석서비스 길단위인구 ${DATA.pop.q}·점포·추정매출 ${SRC.trdar}, 한국부동산원 상업용부동산 임대동향조사 ${SRC.reb}, 역·도로 OpenStreetMap contributors(ODbL). 유동인구는 가게 앞이 아니라 행정동 전체 값입니다.</p></div>`;
+    <div class="block"><h3>계산에 쓴 가정</h3><ul class="assume">
+      <li>· 보증금을 비우면 월세의 ${DEPOSIT_MONTHS}배로 봅니다(관행 가정).</li>
+      <li>· 보증금 차이는 연 ${CONVERSION_RATE * 100}%로 월세 환산합니다(고정 가정, 공식 전환율과 다를 수 있음).</li>
+      <li>· 유동인구 시간대 점수는 ${src && src.kind === "trdar" ? `${esc(src.label)}의 면적당 값(서울시 상권분석서비스 길단위인구-상권 ${esc(src.q)}, 영역 면적은 영역-상권 자료)` : "행정동 전체 값"}이며, 가게 앞 차이는 반경 ${ACT.radius}m 상가 밀집도로 보완합니다.</li>
+      <li>· 연남동 권역 적정 월세는 메디넷부동산 현장 경험값이며, 다른 동은 한국부동산원 임대료 비율로 추정합니다.</li>
+      <li>· 항목 옆 <span class="tag">자동</span>은 공공데이터로 고른 값, <span class="tag hand">직접</span>은 사람이 고른 값입니다.</li>
+    </ul></div>
+    </section>
+    <div class="foot"><p>메디넷부동산공인중개사사무소 · 대표 정영숙 · 02-3141-8837</p><p>이 점수는 상담 참고용이며 계약 판단을 대신하지 않습니다.</p><p>자료: 소상공인시장진흥공단 상가(상권)정보 ${SRC.shops}, 주요상권 ${SRC.areas} 기준, 서울시 상권분석서비스 길단위인구 ${DATA.pop.q}·점포·추정매출 ${SRC.trdar}, 한국부동산원 상업용부동산 임대동향조사 ${SRC.reb}, 역·도로 OpenStreetMap contributors(ODbL). 유동인구는 가게 앞이 아니라 상권 또는 행정동 전체 값입니다.</p></div>`;
   document.getElementById("mini").innerHTML = `<span>${r.total}점 · ${v[0]}</span><span>리포트 보기</span>`;
+  document.getElementById("reportBody").dataset.tab = activeTab;
   paintMap();
   paintZoneMap();
+  paintSameMap(biz);
+}
+const TABS = [["sum", "요약"], ["place", "입지·경쟁"], ["pop", "유동인구"], ["rent", "임대료"], ["check", "계약 확인"]];
+let activeTab = "sum";
+function setTab(key) {
+  activeTab = key;
+  const body = document.getElementById("reportBody");
+  body.dataset.tab = key;
+  body.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === key)));
 }
 function start() {
   buildForm();
   fillForm();
   const form = document.getElementById("form");
   form.addEventListener("submit", e => e.preventDefault());
+  form.addEventListener("click", e => {   // v3: 조건 묶음 제목을 누르면 접고 펼칩니다
+    const legend = e.target.closest("legend");
+    if (legend) legend.parentElement.classList.toggle("closed");
+  });
+  const phone = window.matchMedia("(max-width: 860px)").matches;   // 휴대폰은 기본 정보만 펼쳐 리포트까지 짧게
+  form.querySelectorAll("fieldset").forEach((f, i) => { if (i > (phone ? 0 : 1)) f.classList.add("closed"); });
+  document.getElementById("reportBody").addEventListener("click", e => {
+    const tab = e.target.closest(".tabs button");
+    if (tab) setTab(tab.dataset.tab);
+  });
   form.addEventListener("change", e => {
     if (e.target.name === "deposit" && e.target.value === "") {
       depositManual = false;
@@ -1219,11 +1783,14 @@ function start() {
   form.addEventListener("input", e => {
     const t = e.target;
     if (!t.name) return;
-    state[t.name] = t.type === "number" ? Number(t.value) : t.value;
+    if (t.id === "fieldImport") return;
+    state[t.name] = t.type === "number" || t.name === "fieldAdj" ? Number(t.value) : t.value;
+    if (t.name === "fieldAdj" || t.name === "fieldNote") storeField();
     if (t.name === "address") {
       place = findAddress(t.value);
       manual.clear();
       showSuggestions(place ? [] : suggestAddresses(t.value));
+      loadField();
     }
     if (t.name === "customBiz") {
       showBizSuggestions(t.value);
@@ -1258,9 +1825,34 @@ function start() {
     manual.clear();
     showSuggestions([]);
     fillForm();
+    loadField();
     render();
   });
+  document.getElementById("fieldExport").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(fieldStore(), null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `현장의견_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  });
+  document.getElementById("fieldImport").addEventListener("change", async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const incoming = JSON.parse(await file.text());
+      if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) throw new Error("형식");
+      const merged = { ...fieldStore(), ...incoming };
+      setNote(fieldSave(merged) ? `현장 의견 ${Object.keys(incoming).length}건을 불러왔습니다.` : "이 브라우저에서는 현장 의견을 저장할 수 없습니다.");
+      loadField();
+      render();
+    } catch (err) {
+      setNote("현장 의견 파일을 읽지 못했습니다. 내보내기로 만든 파일인지 확인하세요.");
+    }
+    e.target.value = "";
+  });
   place = findAddress(state.address);
+  loadField();
   render();
   startActions();
 }
@@ -1284,6 +1876,7 @@ function choosePlace(a) {
   manual.clear();
   document.getElementById("address").value = a[0];
   showSuggestions([]);
+  loadField();
   render();
 }
 function showSuggestions(list) {

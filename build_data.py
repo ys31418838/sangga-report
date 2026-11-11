@@ -289,6 +289,75 @@ def thresholds(addr, shops):
     return result
 
 
+# ── 3-1. 주소 단위 상권 활력 (v2 추가) ──────────────────────────
+ACT_RADIUS = 150             # 가게 앞 활력을 셀 반경 (m), 행정동 값보다 좁은 범위의 차이를 봅니다
+
+
+def micro_activity(addr, shops, cat_life):
+    """주소마다 반경 ACT_RADIUS 안 생활업종 상가 수와 마포구 내 백분위를 addr[8], addr[9]에 붙입니다."""
+    import numpy as np
+    pts = np.array([(s[0], s[1]) for s in shops if cat_life[s[2]]], dtype=float)
+    counts = []
+    for a in addr:
+        d = np.hypot((a[2] - pts[:, 0]) * M_LAT, (a[3] - pts[:, 1]) * M_LNG)
+        counts.append(int((d <= ACT_RADIUS).sum()))
+    ordered = np.sort(counts)
+    n = len(counts)
+    for a, c in zip(addr, counts):
+        less = int(np.searchsorted(ordered, c, "left"))
+        same = int(np.searchsorted(ordered, c, "right")) - less
+        del a[8:]
+        a.append(round((less + same / 2) / n * 100))   # 같은 값은 같은 백분위
+        a.append(c)
+    return {"radius": ACT_RADIUS, "p33": int(np.percentile(counts, 33.3)), "p67": int(np.percentile(counts, 66.7))}
+
+
+# ── 3-2. 상권 단위 유동인구 (v2.1 추가) ─────────────────────────
+#   서울 열린데이터광장 OA-15568 '길단위인구-상권' + OA-15560 '영역-상권'(면적)
+#   상권 총인구는 면적이 클수록 커지므로(상관 0.7) 면적당 인구로 서울 전체 상권 순위를 매깁니다.
+def build_trdar_population(pop_path: Path, relm_path: Path, mapo_codes):
+    area = {r["상권_코드"]: float(r["영역_면적"]) for r in read_csv(relm_path) if float(r.get("영역_면적") or 0) > 0}
+    rows = read_csv(pop_path)
+    q = max(r["기준_년분기_코드"] for r in rows)
+    prev_q = f"{int(q[:4]) - 1}{q[4]}"
+    cur = [r for r in rows if r["기준_년분기_코드"] == q and r["상권_코드"] in area]
+    prev = {r["상권_코드"]: r for r in rows if r["기준_년분기_코드"] == prev_q}
+    f = lambda r, k: float(r[k + "_유동인구_수"])
+    total = lambda r: float(r["총_유동인구_수"])
+    per = lambda fn: (lambda r: fn(r) / area[r["상권_코드"]])        # 면적(㎡)당
+    pm = per(lambda r: f(r, "시간대_11_14") + f(r, "시간대_14_17"))
+    eve = per(lambda r: f(r, "시간대_17_21"))
+    end = per(lambda r: sum(f(r, d) for d in WEEKEND))
+    am = per(lambda r: f(r, "시간대_06_11"))
+    wk = per(lambda r: sum(f(r, d) for d in WEEKDAYS) / 5)
+    we = per(lambda r: sum(f(r, d) for d in WEEKEND) / 2)
+    young = lambda r: (f(r, "연령대_20") + f(r, "연령대_30")) / max(1.0, total(r))
+
+    def ranks(fn):
+        order = sorted(cur, key=lambda r: -fn(r))
+        return {r["상권_코드"]: i + 1 for i, r in enumerate(order)}
+
+    rk = {name: ranks(fn) for name, fn in [("mor", am), ("day", pm), ("eve", eve), ("end", end), ("ry", young)]}
+    fns = {"am": am, "pm": pm, "eve": eve, "wk": wk, "we": we}
+    avg = {k: sum(fn(r) for r in cur) / len(cur) for k, fn in fns.items()}
+    out = {}
+    for r in cur:
+        code = r["상권_코드"]
+        if code not in mapo_codes:
+            continue
+        t, p = total(r), prev.get(code)
+        out[code] = {
+            "name": r["상권_코드_명"], "kind": r["상권_구분_코드_명"],
+            "mor": rk["mor"][code], "day": rk["day"][code], "eve": rk["eve"][code], "end": rk["end"][code], "ry": rk["ry"][code],
+            "young": round(young(r) * 100, 1),
+            "yoy": round((t / total(p) - 1) * 100, 1) if p and total(p) else 0,
+            "time": [round(f(r, c) / t * 100, 1) for c in TIME_COLS] if t else [0] * 6,
+            "age": [round(f(r, c) / t * 100, 1) for c in AGE_COLS] if t else [0] * 6,
+            "dense": {k: round(fn(r) / avg[k], 2) for k, fn in fns.items()},
+        }
+    return dict(sorted(out.items())), {"n": len(cur), "q": quarter_label(q)}
+
+
 # ── 4. 행정동 유동인구 ──────────────────────────────────────────
 def build_population(dong_path: Path, seoul_path: Path):
     rows = read_csv(dong_path)
@@ -310,7 +379,7 @@ def build_population(dong_path: Path, seoul_path: Path):
         order = sorted(cur, key=lambda r: -fn(r))
         return {r["행정동_코드"]: i + 1 for i, r in enumerate(order)}
 
-    rk = {name: ranks(fn) for name, fn in [("day", pm), ("eve", eve), ("end", end), ("ry", young)]}
+    rk = {name: ranks(fn) for name, fn in [("mor", am), ("day", pm), ("eve", eve), ("end", end), ("ry", young)]}
     avg = {name: sum(fn(r) for r in cur) / len(cur) for name, fn in [("am", am), ("pm", pm), ("eve", eve), ("wk", wk), ("we", we)]}
     fns = {"am": am, "pm": pm, "eve": eve, "wk": wk, "we": we}
 
@@ -323,7 +392,7 @@ def build_population(dong_path: Path, seoul_path: Path):
         p = prev.get(code)
         dongs[code] = {
             "name": r["행정동_코드_명"],
-            "day": rk["day"][code], "eve": rk["eve"][code], "end": rk["end"][code],
+            "mor": rk["mor"][code], "day": rk["day"][code], "eve": rk["eve"][code], "end": rk["end"][code],
             "young": round(young(r) * 100, 1), "ry": rk["ry"][code],
             "yoy": round((t / total(p) - 1) * 100, 1) if p and total(p) else 0,
             "time": [round(f(r, c) / t * 100, 1) for c in TIME_COLS],
@@ -400,6 +469,9 @@ def main():
             if k in old:
                 data[k] = old[k]
 
+    data["act"] = micro_activity(data["addr"], data["shops"], data["catLife"])
+    print(f"주소 단위 상권 활력: 반경 {data['act']['radius']}m, 하위 1/3 ≤{data['act']['p33']}곳, 상위 1/3 ≥{data['act']['p67']}곳")
+
     dong_file, seoul_file = find_file("길단위인구-행정동"), find_file("길단위인구-서울시")
     if dong_file and seoul_file:
         print(f"유동인구: {dong_file.name}, {seoul_file.name}")
@@ -428,10 +500,17 @@ def main():
         for k in ["trdar", "tq", "tstat"]:
             if k in old:
                 data[k] = old[k]
+    tpop_file, relm_file = find_file("길단위인구-상권"), find_file("영역-상권")
+    if tpop_file and relm_file and "trdar" in data:
+        data["tpop"], data["tpopMeta"] = build_trdar_population(tpop_file, relm_file, {t[0] for t in data["trdar"]})
+        print(f"상권 유동인구: {tpop_file.name} ({data['tpopMeta']['q']}, 서울 {data['tpopMeta']['n']}개 상권 중 마포구 {len(data['tpop'])}개)")
+    elif "tpop" in old:
+        print("상권 유동인구: 파일 없음 → 기존 자료를 그대로 씁니다")
+        data["tpop"], data["tpopMeta"] = old["tpop"], old["tpopMeta"]
     data["meta"] = meta
 
-    order = ["cats", "addr", "areas", "th", "dongs", "seoul", "pop", "catTop", "catLife", "shops",
-             "zoneOK", "base", "tf", "unitsPerM", "reb", "trdar", "tq", "tstat", "stations", "roads", "meta"]
+    order =["cats", "addr", "areas", "th", "dongs", "seoul", "pop", "catTop", "catLife", "shops",
+             "zoneOK", "base", "tf", "unitsPerM", "reb", "trdar", "tq", "tstat", "stations", "roads", "act", "tpop", "tpopMeta", "meta"]
     data = {k: data[k] for k in order if k in data}
 
     print("\n변경 요약 (기존 → 새 자료)")
